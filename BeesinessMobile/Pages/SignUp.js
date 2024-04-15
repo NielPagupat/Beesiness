@@ -46,7 +46,7 @@ export default function SignUp() {
     const [address, setAddress] = useState();
 
     const register = () => {
-        navigation.navigate('Login');
+        navigation.navigate('Activation');
     }
 
 
