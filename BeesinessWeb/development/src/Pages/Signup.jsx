@@ -12,23 +12,35 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
 // TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme();
+const today = new Date().toISOString().split('T')[0];
+const textFieldStyle = {
+  flex:2, marginX:1, marginY:2, boxShadow: '5px 10px 10px rgba(0, 0, 0, 0.5)',
+  '& .MuiInputBase-input': {
+    color: 'white', // Change input text color to white
+  },
+  '& label': {
+      color: 'white', // Change label color to white
+  },
+  '& .MuiInputLabel-root.Mui-focused': {
+      color: 'orange', // Change label color when focused to orange
+  },
+  '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+          borderColor: 'orange', // Change outline color to orange
+      },
+      '&:hover fieldset': {
+          borderColor: 'orange', // Change outline color on hover to orange
+      },
+      '&.Mui-focused fieldset': {
+          borderColor: 'orange', // Change outline color when focused to orange
+      },
+  },
+}
 
 export default function SignUp() {
   const handleSubmit = (event) => {
@@ -40,9 +52,10 @@ export default function SignUp() {
     });
   };
 
+  const [date, setDate] = React.useState(new Date().toISOString().split('T')[0])
   return (
-    <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="md">
+    <Box sx={{backgroundImage:'url(../src/assets/beehive.png)', backgroundSize:'cover', display:'flex', flex:1, height:'100vh', alignItems:'center'}}>
+      <Container component="main" maxWidth="md" sx={{backgroundColor:'rgba(32, 32, 32, 0.6)', height:800, borderRadius:20, boxShadow: '10px 20px 20px rgba(0, 0, 0, 0.5)'}}>
         <CssBaseline />
         <Box
           sx={{
@@ -52,10 +65,8 @@ export default function SignUp() {
             alignItems: 'center',
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
+          <Avatar sx={{ m: 1, width: 100, height: 100}} src='../src/assets/beesiness.png'/>
+          <Typography component="h1" variant="h5" color={'white'}>
             Sign up
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{display:'flex',flexDirection:'column', mt: 3 }}>
@@ -64,18 +75,17 @@ export default function SignUp() {
                         autoComplete="given-name"
                         name="firstName"
                         required
-                        sx={{flex:2, marginX:1}}
                         id="firstName"
                         label="First Name"
-                        helperText="Birthdate"
                         autoFocus
+                        sx={textFieldStyle}
                         />
 
                 <TextField
                         autoComplete="surname"
                         name="lastname"
                         required
-                        sx={{flex:2, marginX:1}}
+                        sx={textFieldStyle}
                         id="lastname"
                         label="Last Name"
                         autoFocus
@@ -84,7 +94,7 @@ export default function SignUp() {
                         autoComplete="mi"
                         name="mi"
                         required
-                        sx={{flex:1, marginX:1}}
+                        sx={textFieldStyle}
                         id="mi"
                         label="M.I."
                         autoFocus
@@ -95,16 +105,18 @@ export default function SignUp() {
                     autoComplete="05/05/2000"
                     name="bdate"
                     required
-                    sx={{flex:1, marginX:1}}
+                    sx={textFieldStyle}
                     id="Birthday"
                     autoFocus
                     type='date'
+                    defaultValue={date}
+                    label='Birthdate'
                     />
                 <TextField
                     autoComplete="Gender"
                     name="gender"
                     required
-                    sx={{flex:1, marginX:1}}
+                    sx={textFieldStyle}
                     id="gender"
                     label="Gender"
                     autoFocus
@@ -118,7 +130,7 @@ export default function SignUp() {
                     required
                     id="email"
                     label="Email"
-                    sx={{flex:1, marginX:1, marginY:2}}
+                    sx={textFieldStyle}
                     autoFocus
                     />
             </Box>
@@ -129,7 +141,7 @@ export default function SignUp() {
                     required
                     id="password"
                     label="Password"
-                    sx={{flex:1, marginX:1, marginY:2}}
+                    sx={textFieldStyle}
                     autoFocus
                     type='password'
                     />
@@ -141,7 +153,7 @@ export default function SignUp() {
                     required
                     id="confirm-password"
                     label="confirm-password"
-                    sx={{flex:1, marginX:1, marginY:2}}
+                    sx={textFieldStyle}
                     autoFocus
                     />
             </Box>
@@ -150,6 +162,7 @@ export default function SignUp() {
                 type="submit"
                 variant="contained"
                 sx={{width:200, marginX:1}}
+                color='warning'
                 >
                 Sign Up
                 </Button>
@@ -164,8 +177,7 @@ export default function SignUp() {
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 5 }} />
       </Container>
-    </ThemeProvider>
+    </Box>     
   );
 }

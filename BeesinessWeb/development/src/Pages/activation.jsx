@@ -28,8 +28,29 @@ function Copyright(props) {
 
 // TODO remove, this demo shouldn't need to reset the theme.
 
-const defaultTheme = createTheme();
-
+const textFieldStyle = {
+  flex:2, marginX:1, marginY:2, boxShadow: '5px 10px 10px rgba(0, 0, 0, 0.5)',
+  '& .MuiInputBase-input': {
+    color: 'white', // Change input text color to white
+  },
+  '& label': {
+      color: 'white', // Change label color to white
+  },
+  '& .MuiInputLabel-root.Mui-focused': {
+      color: 'orange', // Change label color when focused to orange
+  },
+  '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+          borderColor: 'orange', // Change outline color to orange
+      },
+      '&:hover fieldset': {
+          borderColor: 'orange', // Change outline color on hover to orange
+      },
+      '&.Mui-focused fieldset': {
+          borderColor: 'orange', // Change outline color when focused to orange
+      },
+  },
+}
 export default function SignIn() {
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -41,8 +62,8 @@ export default function SignIn() {
   };
 
   return (
-    <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="xs">
+    <Box sx={{backgroundImage:'url(../src/assets/beehive.png)', backgroundSize:'cover', display:'flex', height:'100vh', flex:1, alignItems:'center'}}>
+      <Container component="main" maxWidth="sm" sx={{display: 'flex', flexDirection: 'column', height:800}}>
         <CssBaseline />
         <Box
           sx={{
@@ -50,12 +71,14 @@ export default function SignIn() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            backgroundColor:'rgba(32, 32, 32, 0.6)',
+            paddingY:10,
+            borderRadius:20,
+            boxShadow: '10px 20px 20px rgba(0, 0, 0, 0.5)'
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
+          <Avatar sx={{ m: 1, width: 100, height: 100}} src='../src/assets/beesiness.png' />
+          <Typography component="h1" variant="h5" color={'white'}>
             Activate Account
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
@@ -68,6 +91,7 @@ export default function SignIn() {
               name="UID"
               autoComplete="UID"
               autoFocus
+              sx={textFieldStyle}
             />
             <TextField
               margin="normal"
@@ -77,29 +101,29 @@ export default function SignIn() {
               label="token"
               type="token"
               id="token"
+              sx={textFieldStyle}
             />
-            <Typography sx={{textAlign:'center'}}>
-                Check Your Email to Check the Emailed UID and Token
+            <Typography sx={{textAlign:'center'}} color={'white'}>
+                Check Your Email to get the Emailed UID and Token
             </Typography>
             <Button
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
+              color='warning'
             >
               Activate
             </Button>
-            <Grid container>
-              <Grid item>
-                <Link href="#" variant="body2">
-                  {"Resend Activation Code"}
-                </Link>
-              </Grid>
-            </Grid>
+            <Box sx={{display:'flex', flex:1, justifyContent:'center'}}>
+              <Link href="#" variant="body2">
+                {"Resend Activation Code"}
+              </Link>
+            </Box>
           </Box>
         </Box>
         <Copyright sx={{ mt: 8, mb: 4 }} />
       </Container>
-    </ThemeProvider>
+    </Box>
   );
 }
