@@ -4,6 +4,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Avatar, Card, Text, TextInput} from "react-native-paper";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from "@react-navigation/native";
+import DateTimePicker from '@react-native-community/datetimepicker'
 
 export default function SignUp() {
     const navigation = useNavigation()
@@ -30,6 +31,14 @@ export default function SignUp() {
             setReEyeIcon('eye-off')
         }
     }
+
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [date, setDate] = useState(new Date());
+
+    const onChange = (event, date) => {
+        setShowDatePicker(false);
+        setDate(date);
+      };
     
     const backToLogin = () => {
         navigation.navigate('Login');
@@ -43,10 +52,10 @@ export default function SignUp() {
     const [lname, setLname] = useState();
     const [mi, setMI] = useState();
     const [gender, setGender] = useState();
-    const [address, setAddress] = useState();
+    const [birthday, setBirthday] = useState();
 
     const register = () => {
-        navigation.navigate('Login');
+        navigation.navigate('Activation');
     }
 
 
@@ -90,7 +99,22 @@ export default function SignUp() {
                             </View>
                         </View>
                         <View style={styles.inputBoxes}>
-                            <TextInput selectionColor="black" underlineColor="transparent" activeUnderlineColor="#987554" style={styles.textInputs} label="Address" onChangeText={setAddress}/>
+                        <TouchableOpacity style={{backgroundColor: 'white', borderRadius:10, height:50, justifyContent:'center'}} onPress={() => setShowDatePicker(true)}>
+                        <Text style={{marginLeft:15, color:'gray'}}>
+                            Birth Date:
+                        </Text>
+                        <Text style={{marginLeft:15, fontSize:16}}>
+                            {date.toDateString()}
+                        </Text>
+                        {showDatePicker && (
+                            <DateTimePicker
+                            value={date} 
+                            mode="date"
+                            display="calendar"
+                            onChange={onChange}
+                            />
+                        )}
+                        </TouchableOpacity>
                         </View>
                         <View style={{flexDirection: "row", justifyContent:'center', alignItems:'center', marginTop: 20, marginHorizontal:10}}>
                             <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', width:100, backgroundColor:'#fff4ac', padding:10, borderRadius:10}} onPress={register}>
