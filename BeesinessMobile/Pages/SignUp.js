@@ -33,11 +33,9 @@ export default function SignUp() {
     }
 
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const [date, setDate] = useState(new Date());
-
-    const onChange = (event, date) => {
+    const onChange = (event, birthday) => {
         setShowDatePicker(false);
-        setDate(date);
+        setBirthday(birthday);
       };
     
     const backToLogin = () => {
@@ -52,7 +50,7 @@ export default function SignUp() {
     const [lname, setLname] = useState();
     const [mi, setMI] = useState();
     const [gender, setGender] = useState();
-    const [birthday, setBirthday] = useState();
+    const [birthday, setBirthday] = useState(new Date());
 
     const register = () => {
         navigation.navigate('Activation');
@@ -104,11 +102,11 @@ export default function SignUp() {
                             Birth Date:
                         </Text>
                         <Text style={{marginLeft:15, fontSize:16}}>
-                            {date.toDateString()}
+                            {birthday.toDateString()}
                         </Text>
                         {showDatePicker && (
                             <DateTimePicker
-                            value={date} 
+                            value={birthday} 
                             mode="date"
                             display="calendar"
                             onChange={onChange}
