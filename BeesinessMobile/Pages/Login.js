@@ -3,6 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Card, Text, TextInput, Button, Avatar } from 'react-native-paper'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
+import axios from 'axios'
 
 export default function Login() {
     const navigation = useNavigation()
@@ -23,11 +24,31 @@ export default function Login() {
         navigation.navigate('SignUp')
     }
 
-    const [email, setEmail] = useState()
-    const [password, setPassword] = useState()
+    const [credential, setCredential] = useState({
+        "password": "",
+        "email": ""
+    })
     
-    const logIn = () => {
-        navigation.navigate('Dashboard')
+    const checkCredentials = (key, value) => {
+        setCredential(prevState => ({
+            ...prevState,
+            [key]:value
+        }))
+    }
+    
+    const logIn = async() => {
+        const result = axios.post('http://10.0.254.16:8000/api/v2/auth/token/login/', credential, {
+            headers:{
+                'Content-Type':'application/JSON',
+                'Referrer-Policy':'same-origin',
+                'Cross-Origin-Opener-Policy':'same-origin'
+            }
+        }).then(response => {
+            navigation.navigate('Dashboard')
+        })
+        .catch(error => {
+            alert('Invalid Credentials')
+        });
     }
 
   return (
@@ -41,8 +62,17 @@ export default function Login() {
         <View style={styles.view}>
             <Card style={{backgroundColor:'#987544'}}>
                 <Card.Content>
-                    <TextInput style={{backgroundColor:'white'}} label="E-mail" activeUnderlineColor='#987554' keyboardType='email-address' onChangeText={setEmail}></TextInput>
-                    <TextInput style={{marginTop:10, backgroundColor:'white'}} label="Password" activeUnderlineColor='#987554' secureTextEntry={pVisibility}  onChangeText={setPassword} right={<TextInput.Icon icon={eyeIcon} onPress={showPass}/>}/>
+                    <TextInput style={{backgroundColor:'white'}} 
+                               label="E-mail" 
+                               activeUnderlineColor='#987554' 
+                               keyboardType='email-address' 
+                               onChangeText={(e)=>checkCredentials('email', e)}/>
+                    <TextInput style={{marginTop:10, backgroundColor:'white'}} 
+                               label="Password" 
+                               activeUnderlineColor='#987554' 
+                               secureTextEntry={pVisibility}  
+                               onChangeText={(e)=>checkCredentials('password', e)}
+                               right={<TextInput.Icon icon={eyeIcon} onPress={showPass}/>}/>
                     <Button textColor='white' style={{alignSelf:'flex-end'}}>Forgot Password?</Button>
                     <TouchableOpacity style={{alignItems:'center', justifyContent:'center', backgroundColor:'#fff4ac', padding:10, borderRadius:10}} onPress={logIn}>
                         <Text style={{fontWeight:'bold'}}>Log-in</Text>

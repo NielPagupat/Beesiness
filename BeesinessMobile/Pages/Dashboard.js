@@ -16,7 +16,7 @@ export default function Dashboard() {
   }
   return (
     <SafeAreaView style={styles.container}>
-      <View style={{width:'100%'}}><TopNavigation onPress={toLogOut}/></View>
+      <View style={{width:'100%'}}><TopNavigation/></View>
       <View style={styles.content}><Text>dashboard contents</Text></View>
       <View></View>
     </SafeAreaView>

@@ -5,9 +5,30 @@ import { Avatar, Card, Text, TextInput} from "react-native-paper";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from "@react-navigation/native";
 import DateTimePicker from '@react-native-community/datetimepicker'
-
+import axios from 'axios'
 export default function SignUp() {
     const navigation = useNavigation()
+    const [userData, setUserData] = useState({
+        "email": "",
+        "password": "",
+        "confirm_password": "",
+        "first_name": "",
+        "last_name": "",
+        "middle_initial": "",
+        "birthday": "",
+        "gender": ""
+    })
+    const [birthday, setBirthday] = useState(new Date());//no remove
+    
+    const handleDataChange = (key, value) =>{
+        setUserData(prevState => ({
+            ...prevState,
+            [key]:value
+        }))
+    }
+
+   
+
     const [pVisibility, setPVisibility] = useState(true)
     const [eyeIcon, setIcon] = useState('eye-off')
     const showPass = () => {
@@ -33,9 +54,13 @@ export default function SignUp() {
     }
 
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const onChange = (event, birthday) => {
+    const onChange = (birthday) => {
         setShowDatePicker(false);
-        setBirthday(birthday);
+        const year = birthday.getFullYear();
+        const month = String(birthday.getMonth() + 1).padStart(2, '0');
+        const day = String(birthday.getDate()).padStart(2, '0');
+        const birthdate = `${year}-${month}-${day}`;
+        // handleDataChange('birthday', birthdate)
       };
     
     const backToLogin = () => {
@@ -43,17 +68,18 @@ export default function SignUp() {
     }
 
 
-    const [email, setEmail] = useState();
-    const [passwd, setPasswd] = useState();
-    const [passwdConfirm, setPasswdConfirm] = useState();
-    const [fname, setFname] = useState();
-    const [lname, setLname] = useState();
-    const [mi, setMI] = useState();
-    const [gender, setGender] = useState();
-    const [birthday, setBirthday] = useState(new Date());
-
-    const register = () => {
-        navigation.navigate('Activation');
+    const register = async() => {
+        const result = await axios.post('http://10.0.254.16:8000/api/v2/auth/users/', userData, 
+        {headers:{
+        'Content-Type':'application/JSON',
+        'Referrer-Policy':'same-origin',
+        'Cross-Origin-Opener-Policy':'same-origin'
+        }}).then(response => {
+            navigation.navigate('Activation', {email: userData.email})
+        })
+        .catch(error => {
+            alert('Sign-In Unsuccessful ', error)
+        });
     }
 
 
@@ -74,26 +100,68 @@ export default function SignUp() {
                     </View>
                     <View>
                         <View style={styles.inputBoxes}>
-                            <TextInput selectionColor="black" underlineColor="transparent" activeUnderlineColor="#987554" style={styles.textInputs} label="E-mail" onChangeText={setEmail}/>
+                            <TextInput selectionColor="black" 
+                                       underlineColor="transparent" 
+                                       activeUnderlineColor="#987554" 
+                                       style={styles.textInputs} 
+                                       label="E-mail" 
+                                       onChangeText={(e)=>handleDataChange('email', e)}/>
                         </View>
                         <View style={styles.inputBoxes}>
-                            <TextInput selectionColor="black" underlineColor="transparent" activeUnderlineColor="#987554" style={styles.textInputs} label="Password" onChangeText={setPasswd} secureTextEntry={pVisibility}  right={<TextInput.Icon icon={eyeIcon} onPress={showPass}/>}/>
+                            <TextInput selectionColor="black" 
+                                       underlineColor="transparent" 
+                                       activeUnderlineColor="#987554" 
+                                       style={styles.textInputs} 
+                                       label="Password"
+                                       secureTextEntry={pVisibility}  
+                                       right={<TextInput.Icon icon={eyeIcon} 
+                                       onPress={showPass}/>}
+                                       onChangeText={(e)=>handleDataChange('password', e)}/>
                         </View>
                         <View style={styles.inputBoxes}>
-                            <TextInput selectionColor="black" underlineColor="transparent" activeUnderlineColor="#987554" style={styles.textInputs} label="Re-enter Password" onChangeText={setPasswdConfirm} secureTextEntry={rePassVisible}  right={<TextInput.Icon icon={reEyeIcon} onPress={showRePass}/>}/>
+                            <TextInput selectionColor="black" 
+                                       underlineColor="transparent" 
+                                       activeUnderlineColor="#987554" 
+                                       style={styles.textInputs} 
+                                       label="Re-enter Password" 
+                                       secureTextEntry={rePassVisible}  
+                                       right={<TextInput.Icon 
+                                       icon={reEyeIcon} 
+                                       onPress={showRePass}/>}
+                                       onChangeText={(e)=>handleDataChange('confirm_password', e)}/>
                         </View>
                         <View style={styles.inputBoxes}>
-                            <TextInput selectionColor="black" underlineColor="transparent" activeUnderlineColor="#987554" style={styles.textInputs} label="Last Name" onChangeText={setLname}/>
+                            <TextInput selectionColor="black" 
+                                       underlineColor="transparent" 
+                                       activeUnderlineColor="#987554" 
+                                       style={styles.textInputs} 
+                                       label="Last Name" 
+                                       onChangeText={(e)=>handleDataChange('last_name', e)}/>
                         </View>
                         <View style={{flexDirection: 'row', marginTop: 10}}>
                             <View style={{flex: 3, marginRight:2.5}}>
-                                <TextInput selectionColor="black" underlineColor="transparent" activeUnderlineColor="#987554" style={{backgroundColor:'white', borderTopLeftRadius:10, borderTopRightRadius:10, borderRadius:10, height:50}} label="First Name" onChangeText={setFname}/>
+                                <TextInput selectionColor="black" 
+                                           underlineColor="transparent" 
+                                           activeUnderlineColor="#987554" 
+                                           style={{backgroundColor:'white', borderTopLeftRadius:10, borderTopRightRadius:10, borderRadius:10, height:50}} 
+                                           label="First Name" 
+                                           onChangeText={(e)=>handleDataChange('first_name', e)}/>
                             </View>
                             <View style={{flex: 1, marginHorizontal:2.5}}>
-                                <TextInput selectionColor="black" underlineColor="transparent" activeUnderlineColor="#987554" style={{backgroundColor:'white', borderTopLeftRadius:10, borderTopRightRadius:10, borderRadius:10, height:50}} label="M.I." onChangeText={setMI}/>
+                                <TextInput selectionColor="black" 
+                                           underlineColor="transparent" 
+                                           activeUnderlineColor="#987554" 
+                                           style={{backgroundColor:'white', borderTopLeftRadius:10, borderTopRightRadius:10, borderRadius:10, height:50}} 
+                                           label="M.I." 
+                                           onChangeText={(e)=>handleDataChange('middle_initial', e)}/>
                             </View>
                             <View style={{flex: 1, marginLeft:2.5}}>
-                            <TextInput selectionColor="black" underlineColor="transparent" activeUnderlineColor="#987554" style={{backgroundColor:'white', borderTopLeftRadius:10, borderTopRightRadius:10, borderRadius:10, height:50}} label="Sex" onChangeText={setGender}/>
+                            <TextInput selectionColor="black" 
+                                       underlineColor="transparent" 
+                                       activeUnderlineColor="#987554" 
+                                       style={{backgroundColor:'white', borderTopLeftRadius:10, borderTopRightRadius:10, borderRadius:10, height:50}} 
+                                       label="Sex" 
+                                       onChangeText={(e)=>handleDataChange('gender', e)}/>
                             </View>
                         </View>
                         <View style={styles.inputBoxes}>
@@ -109,7 +177,7 @@ export default function SignUp() {
                             value={birthday} 
                             mode="date"
                             display="calendar"
-                            onChange={onChange}
+                            onChangeText={(e)=>onChange(e)}
                             />
                         )}
                         </TouchableOpacity>

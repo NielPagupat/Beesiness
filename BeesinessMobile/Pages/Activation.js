@@ -1,17 +1,55 @@
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Card, Text, TextInput, Button, Avatar } from 'react-native-paper'
-import { StyleSheet, TouchableOpacity, View } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
-
+import { StyleSheet, TouchableOpacity, View, Alert } from 'react-native'
+import { useNavigation, useRoute } from '@react-navigation/native'
+import axios from 'axios'
 export default function Login() {
+    const route = useRoute()
+    const {email} = route.params;
     const navigation = useNavigation()    
-
-    const [uid, setUID] = useState()
-    const [token, setToken] = useState()
+    const [activationCreds, setActivationCreds] = useState({
+        "uid":"",
+        "token":""
+    })
     
-    const toLogIn = () => {
-        navigation.navigate('Login')
+    const Activation = (key, value) => {
+        setActivationCreds(prevState=>({
+            ...prevState,
+            [key]: value
+        })).then(response => {
+            navigation.navigate('Login')
+        })
+        .catch(error => {
+            alert('invalid id & token')
+        });
+    }
+
+    const activate = async () => {
+        const result = await axios.post('http://10.0.254.16:8000/api/v2/auth/users/activation/', activationCreds,
+        {headers:{
+        'Content-Type':'application/JSON',
+        'Referrer-Policy':'same-origin',
+        'Cross-Origin-Opener-Policy':'same-origin'
+        }}).then(response => {
+            navigation.navigate('Login')
+        })
+        .catch(error => {
+            alert('Activation Unsuccessful')
+        });
+    }
+        
+
+    const resendActivation = async() => {
+        const result = await axios.post('http://10.0.254.16:8000/api/v2/auth/users/resend_activation/', {"email":email},
+        {headers:{
+            'Content-Type':'application/JSON',
+            'Referrer-Policy':'same-origin',
+            'Cross-Origin-Opener-Policy':'same-origin'
+        }})
+        if (result.status == 201) {
+          alert('activation re-sent to '+ {email})
+        } 
     }
 
   return (
@@ -25,14 +63,21 @@ export default function Login() {
         <View style={styles.view}>
             <Card style={{backgroundColor:'#987544'}}>
                 <Card.Content>
-                    <TextInput style={{marginBottom:5, backgroundColor:'white'}} label="UID" activeUnderlineColor='#987554' onChangeText={setUID}></TextInput>
-                    <TextInput style={{marginTop:5, backgroundColor:'white'}} label="Token" activeUnderlineColor='#987554' onChangeText={setToken}/>
+                    <TextInput style={{marginBottom:5, backgroundColor:'white'}} 
+                               label="UID" 
+                               activeUnderlineColor='#987554' 
+                               onChangeText={(e) =>Activation('id', e)}>
+                               </TextInput>
+                    <TextInput style={{marginTop:5, backgroundColor:'white'}} 
+                               label="Token" 
+                               activeUnderlineColor='#987554' 
+                               onChangeText={(e)=>Activation('token', e)}/>
                     <Text style={{color:'white', margin:5, marginVertical:15}}>UID and Token sent! Please check your Email.</Text>
-                    <TouchableOpacity style={{alignItems:'center', justifyContent:'center', backgroundColor:'#fff4ac', padding:10, borderRadius:10}} onPress={toLogIn}>
+                    <TouchableOpacity style={{alignItems:'center', justifyContent:'center', backgroundColor:'#fff4ac', padding:10, borderRadius:10}} onPress={activate}>
                         <Text style={{fontWeight:'bold'}}>Activate</Text>
                     </TouchableOpacity>
                     <View style={{flexDirection:'row', alignItems:'center', justifyContent:'flex-end', marginTop: 10, marginHorizontal:10}}>
-                        <TouchableOpacity style={{justifyContent:'flex-end'}}>
+                        <TouchableOpacity style={{justifyContent:'flex-end'}} onPress={resendActivation}>
                             <Text style={{color:'white', fontWeight:'bold'}}>Re-send Activation Code</Text>
                         </TouchableOpacity>
                     </View>
