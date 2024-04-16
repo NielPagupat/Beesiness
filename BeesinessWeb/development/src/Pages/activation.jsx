@@ -12,6 +12,8 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 
 function Copyright(props) {
   return (
@@ -52,14 +54,49 @@ const textFieldStyle = {
   },
 }
 export default function SignIn() {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+  const {email} = useParams()
+  const navigate = useNavigate()
+  const [mail, setEmail] = React.useState({
+    'email':email
+  })
+
+  const [activation, setActivation] = React.useState({
+    "uid":"",
+    "token":""
+  })
+
+  const checkActivate = (key, value)  => {
+    setActivation(prevState => ({
+      ...prevState,
+      [key] : value
+    }))
+  }
+  const handleSubmit = async () => {
+    const result = await axios.post('http://localhost:8000/api/v2/auth/users/activation/', activation,
+    {headers:{
+      'Content-Type':'application/JSON',
+      'Referrer-Policy':'same-origin',
+      'Cross-Origin-Opener-Policy':'same-origin'
+    }})
+    if (result.status == 400) {
+      alert('activation unsuccessful')
+    } else {
+      navigate('/')
+    }
+
   };
+  const resend = async() => {
+    const result = await axios.post('http://localhost:8000/api/v2/auth/users/resend_activation/', mail,
+    {headers:{
+        'Content-Type':'application/JSON',
+        'Referrer-Policy':'same-origin',
+        'Cross-Origin-Opener-Policy':'same-origin'
+    }})
+    if (result.status == 201) {
+      alert('activation re-sent to '+ {mail})
+    } 
+  }
+
 
   return (
     <Box sx={{backgroundImage:'url(../src/assets/beehive.png)', backgroundSize:'cover', display:'flex', height:'100vh', flex:1, alignItems:'center'}}>
@@ -92,6 +129,7 @@ export default function SignIn() {
               autoComplete="UID"
               autoFocus
               sx={textFieldStyle}
+              onChange={(e)=>checkActivate('uid',e.target.value)}
             />
             <TextField
               margin="normal"
@@ -102,23 +140,26 @@ export default function SignIn() {
               type="token"
               id="token"
               sx={textFieldStyle}
+              onChange={(e)=>checkActivate('token',e.target.value)}
             />
             <Typography sx={{textAlign:'center'}} color={'white'}>
                 Check Your Email to get the Emailed UID and Token
             </Typography>
             <Button
-              type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
               color='warning'
+              onClick={handleSubmit}
             >
               Activate
             </Button>
             <Box sx={{display:'flex', flex:1, justifyContent:'center'}}>
-              <Link href="#" variant="body2">
-                {"Resend Activation Code"}
-              </Link>
+              <Button>
+                <Link onClick={resend} variant="body2">
+                  {"Resend Activation Code"}
+                </Link>
+              </Button>
             </Box>
           </Box>
         </Box>
