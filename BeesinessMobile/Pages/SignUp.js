@@ -60,7 +60,7 @@ export default function SignUp() {
         const month = String(birthday.getMonth() + 1).padStart(2, '0');
         const day = String(birthday.getDate()).padStart(2, '0');
         const birthdate = `${year}-${month}-${day}`;
-        // handleDataChange('birthday', birthdate)
+        console.log(birthdate)
       };
     
     const backToLogin = () => {
