@@ -116,7 +116,7 @@ export default function SignInSide() {
                   },
                 }}
               />
-              <Button
+              <Button href="/dash"
                 type="submit"
                 fullWidth
                 variant="contained"

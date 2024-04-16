@@ -158,7 +158,7 @@ export default function SignUp() {
                     />
             </Box>
             <Box sx={{display:'flex', flex:1, justifyContent:'center'}}>
-                <Button
+                <Button href="/activate"
                 type="submit"
                 variant="contained"
                 sx={{width:200, marginX:1}}

@@ -106,7 +106,7 @@ export default function SignIn() {
             <Typography sx={{textAlign:'center'}} color={'white'}>
                 Check Your Email to get the Emailed UID and Token
             </Typography>
-            <Button
+            <Button href="/"
               type="submit"
               fullWidth
               variant="contained"
