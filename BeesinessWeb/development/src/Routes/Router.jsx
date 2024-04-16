@@ -11,7 +11,7 @@ export default function Router() {
         <Route path='/' element={<Login/>} />
         <Route path='/dash' element={<Dashboard/>} />
         <Route path='/signup' element={<Signup/>} />
-        <Route path='/activate' element={<Activation/>} />
+        <Route path='/activate/:email' element={<Activation/>} />
     </Routes>
   )
 }

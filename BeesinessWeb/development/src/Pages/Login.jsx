@@ -12,7 +12,8 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const textFieldStyle = {
@@ -37,21 +38,41 @@ const textFieldStyle = {
       },
   },
 }
-const defaultTheme = createTheme();
+
+
 
 export default function SignInSide() {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+  const navigate = useNavigate()
+  const [credentials, setCredentials] = React.useState({
+    "password": "",
+    "email": ""
+  })
+
+  const checkCred = (key, value) => {
+    setCredentials(prevState => ({
+      ...prevState,
+      [key]:value
+    }))
+  }
+  
+  const handleSubmit = async () => {
+    const result = await axios.post('http://localhost:8000/api/v2/auth/token/login/',credentials,
+  {headers:{
+    'Content-Type':'application/JSON',
+    'Referrer-Policy':'same-origin',
+    'Cross-Origin-Opener-Policy':'same-origin'
+  }})
+
+  if (result.status == 200) {
+    navigate('/dash')
+  }
   };
+
+
 
   return (
     <Box sx={{backgroundImage:'url(../src/assets/beehive.png)', backgroundSize:'cover'}}>
-      <Grid container component="main" sx={{ height: '100vh'}}>
+      <Grid container  sx={{ height: '100vh'}}>
         <CssBaseline />
         <Grid
           item
@@ -83,7 +104,7 @@ export default function SignInSide() {
             <Typography component="h1" variant="h5" color={'white'}>
               Sign in
             </Typography>
-            <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1}}>
+            <Box sx={{ mt: 1}}>
               <TextField
                 margin="normal"
                 required
@@ -93,8 +114,8 @@ export default function SignInSide() {
                 name="email"
                 autoComplete="email"
                 autoFocus
-                
                 sx={textFieldStyle}
+                onChange={(e)=>checkCred("email", e.target.value)}
               />
               <TextField
                 margin="normal"
@@ -106,6 +127,7 @@ export default function SignInSide() {
                 id="password"
                 autoComplete="current-password"
                 sx={textFieldStyle}
+                onChange={(e)=>checkCred("password", e.target.value)}
               />
               <FormControlLabel
                 control={<Checkbox value="remember" color="warning" />}
@@ -116,12 +138,12 @@ export default function SignInSide() {
                   },
                 }}
               />
-              <Button href="/dash"
-                type="submit"
+              <Button
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
                 color='warning'
+                onClick={handleSubmit}
               >
                 Sign In
               </Button>

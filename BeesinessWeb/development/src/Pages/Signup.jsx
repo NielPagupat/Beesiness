@@ -3,7 +3,7 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
+
 import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
@@ -13,7 +13,9 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-
+import { useState } from 'react';
+import axios from 'axios'
+import {useNavigate} from 'react-router-dom'
 // TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme();
@@ -43,14 +45,40 @@ const textFieldStyle = {
 }
 
 export default function SignUp() {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+  const navigate = useNavigate()
+
+  const [userData, setUserData] = useState({
+    "email": "",
+    "password": "",
+    "confirm_password": "",
+    "first_name": "",
+    "last_name": "",
+    "middle_initial": "",
+    "birthday": null,
+    "gender": ""
+  })
+  
+  const handleChange = (key, value) => {
+    setUserData(prevState => ({
+      ...prevState,
+      [key] : value
+    }))
   };
+
+  const submit = async () => {
+    const result = await axios.post('http://localhost:8000/api/v2/auth/users/', userData, 
+    {headers:{
+      'Content-Type':'application/JSON',
+      'Referrer-Policy':'same-origin',
+      'Cross-Origin-Opener-Policy':'same-origin'
+    }})
+
+    if (result.status == 201 ) {
+      navigate('/activate/'+userData.email)
+    } else {
+      alert('account creation unsuccessful!')
+    }
+  }
 
   const [date, setDate] = React.useState(new Date().toISOString().split('T')[0])
   return (
@@ -69,7 +97,7 @@ export default function SignUp() {
           <Typography component="h1" variant="h5" color={'white'}>
             Sign up
           </Typography>
-          <Box component="form" noValidate onSubmit={handleSubmit} sx={{display:'flex',flexDirection:'column', mt: 3 }}>
+          <Box sx={{display:'flex',flexDirection:'column', mt: 3 }}>
             <Box sx={{display:'flex', flexDirection:'row'}}>
                 <TextField
                         autoComplete="given-name"
@@ -79,6 +107,7 @@ export default function SignUp() {
                         label="First Name"
                         autoFocus
                         sx={textFieldStyle}
+                        onChange={(e)=>handleChange('first_name', e.target.value)}
                         />
 
                 <TextField
@@ -89,6 +118,7 @@ export default function SignUp() {
                         id="lastname"
                         label="Last Name"
                         autoFocus
+                        onChange={(e)=>handleChange('last_name', e.target.value)}
                         />
                 <TextField
                         autoComplete="mi"
@@ -98,6 +128,7 @@ export default function SignUp() {
                         id="mi"
                         label="M.I."
                         autoFocus
+                        onChange={(e)=>handleChange('middle_initial', e.target.value)}
                         />
             </Box>
             <Box sx={{display:'flex', flexDirection:'row'}}>
@@ -111,6 +142,7 @@ export default function SignUp() {
                     type='date'
                     defaultValue={date}
                     label='Birthdate'
+                    onChange={(e)=>handleChange('birthday', e.target.value)}
                     />
                 <TextField
                     autoComplete="Gender"
@@ -120,6 +152,7 @@ export default function SignUp() {
                     id="gender"
                     label="Gender"
                     autoFocus
+                    onChange={(e)=>handleChange('gender', e.target.value)}
                     />
             </Box>
 
@@ -132,6 +165,7 @@ export default function SignUp() {
                     label="Email"
                     sx={textFieldStyle}
                     autoFocus
+                    onChange={(e)=>handleChange('email', e.target.value)}
                     />
             </Box>
             <Box sx={{display:'flex'}}>
@@ -144,6 +178,7 @@ export default function SignUp() {
                     sx={textFieldStyle}
                     autoFocus
                     type='password'
+                    onChange={(e)=>handleChange('password', e.target.value)}
                     />
             </Box>
             <Box sx={{display:'flex'}}>
@@ -153,16 +188,18 @@ export default function SignUp() {
                     required
                     id="confirm-password"
                     label="confirm-password"
+                    type='password'
+                    onChange={(e)=>handleChange('confirm_password', e.target.value)}
                     sx={textFieldStyle}
                     autoFocus
                     />
             </Box>
             <Box sx={{display:'flex', flex:1, justifyContent:'center'}}>
-                <Button href="/activate"
-                type="submit"
+                <Button
                 variant="contained"
                 sx={{width:200, marginX:1}}
                 color='warning'
+                onClick={submit}
                 >
                 Sign Up
                 </Button>
