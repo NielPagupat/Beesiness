@@ -66,14 +66,14 @@ export default function Login() {
                     <TextInput style={{marginBottom:5, backgroundColor:'white'}} 
                                label="UID" 
                                activeUnderlineColor='#987554' 
-                               onChangeText={(e) =>Activation('id', e)}>
+                               onChangeText={(e) =>Activation('uid', e)}>
                                </TextInput>
                     <TextInput style={{marginTop:5, backgroundColor:'white'}} 
                                label="Token" 
                                activeUnderlineColor='#987554' 
                                onChangeText={(e)=>Activation('token', e)}/>
                     <Text style={{color:'white', margin:5, marginVertical:15}}>UID and Token sent! Please check your Email.</Text>
-                    <TouchableOpacity style={{alignItems:'center', justifyContent:'center', backgroundColor:'#fff4ac', padding:10, borderRadius:10}} onPress={activate}>
+                    <TouchableOpacity style={{alignItems:'center', justifyContent:'center', backgroundColor:'#fff4ac', padding:10, borderRadius:10}} onPress={()=>activate}>
                         <Text style={{fontWeight:'bold'}}>Activate</Text>
                     </TouchableOpacity>
                     <View style={{flexDirection:'row', alignItems:'center', justifyContent:'flex-end', marginTop: 10, marginHorizontal:10}}>

@@ -15,7 +15,7 @@ export default function SignUp() {
         "first_name": "",
         "last_name": "",
         "middle_initial": "",
-        "birthday": "",
+        "birthday": "2003-07-26",
         "gender": ""
     })
     const [birthday, setBirthday] = useState(new Date());//no remove
