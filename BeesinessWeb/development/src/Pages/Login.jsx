@@ -61,11 +61,12 @@ export default function SignInSide() {
     'Content-Type':'application/JSON',
     'Referrer-Policy':'same-origin',
     'Cross-Origin-Opener-Policy':'same-origin'
-  }})
-
-  if (result.status == 200) {
-    navigate('/dash')
-  }
+  }}).then(response=>{
+    navigate('/dash/'+response.data.auth_token)
+    console.log(response)
+  }).catch(error=>{
+    alert("invalidCredentials")
+  })
   };
 
 

@@ -17,8 +17,9 @@ import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-
-
+import { useParams } from 'react-router-dom';
+import { Button } from '@mui/material';
+import axios from 'axios'
 
 
 function Copyright(props) {
@@ -84,11 +85,39 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const defaultTheme = createTheme();
 
 export default function Dashboard() {
+  const {auth_token} = useParams()
+  const [allUsers, setAllUsers] = React.useState([])
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
   };
+  const getUserAccountsList = async() => {
+    const result = await axios.get('http://localhost:8000/api/v2/auth/getAllUsers/',
+  {headers:{
+    'Content-Type':'application/JSON',
+    'Referrer-Policy':'same-origin',
+    'Cross-Origin-Opener-Policy':'same-origin'
+  }}).then(response=>{
+    console.log(response)
+    setAllUsers(response.data)
 
+  }).catch(error=>{
+    console.log(error)
+  })
+  }
+
+  const checkUsers = () => {
+    console.log(allUsers)
+  }
+
+  React.useEffect(()=>{
+    getUserAccountsList
+     // Refresh data every 3 seconds
+     const intervalId = setInterval(getUserAccountsList, 3000);
+
+     // Clean up function to clear the interval
+     return () => clearInterval(intervalId);
+  }, [])
   return (
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: 'flex' }}>
@@ -142,7 +171,7 @@ export default function Dashboard() {
           </Toolbar>
           <Divider />
           <List component="nav">
-            {/* {mainListItems} */}
+    
             <Divider sx={{ my: 1 }} />
             {/* {secondaryListItems} */}
           </List>
@@ -169,10 +198,17 @@ export default function Dashboard() {
                     p: 2,
                     display: 'flex',
                     flexDirection: 'column',
-                    height: 240,
+                    height: '240px', // Adjust the maximum height as needed
+                    overflowX: 'auto', // Enable horizontal scrolling
+                    overflowY: 'auto', // Enable vertical scrolling
                   }}
                 >
-                  
+                {allUsers.map(obj => (
+                    <div key={obj.email} style={{ display: 'flex', flexDirection: 'row' }}>
+                        <Typography>Email: {obj.email}</Typography>
+                        <Typography>Last Login: {obj.last_login}</Typography>
+                    </div>
+                ))}
                 </Paper>
               </Grid>
               {/* Recent Deposits */}
@@ -183,13 +219,17 @@ export default function Dashboard() {
                     display: 'flex',
                     flexDirection: 'column',
                     height: 240,
+                    overflowX: 'auto',
+                    overflowY: 'auto',
                   }}
                 >
+                   
                 </Paper>
               </Grid>
               {/* Recent Orders */}
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                  
                 </Paper>
               </Grid>
             </Grid>

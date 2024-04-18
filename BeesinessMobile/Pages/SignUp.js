@@ -54,7 +54,7 @@ export default function SignUp() {
     }
 
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const onChange = (birthday) => {
+    const onChange = (event, birthday) => {
         setShowDatePicker(false);
         const year = birthday.getFullYear();
         const month = String(birthday.getMonth() + 1).padStart(2, '0');
@@ -177,7 +177,7 @@ export default function SignUp() {
                             value={birthday} 
                             mode="date"
                             display="calendar"
-                            onChangeText={(e)=>onChange(e)}
+                            onChangeText={onChange}
                             />
                         )}
                         </TouchableOpacity>

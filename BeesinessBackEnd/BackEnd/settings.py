@@ -69,7 +69,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_HEADERS = [
     'content-type',
     'Referrer-Policy',
-    'Cross-Origin-Opener-Policy',
+    'Cross-Origin-Opener-Policy'
 ]
 
 TEMPLATES = [

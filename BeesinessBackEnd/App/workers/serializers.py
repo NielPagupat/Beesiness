@@ -4,6 +4,7 @@ from djoser.serializers import UserCreateSerializer, ActivationSerializer
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 from djoser import utils
+from .models import CustomUser
 User = get_user_model()
 
 class CustomUserSerializer(UserCreateSerializer):
