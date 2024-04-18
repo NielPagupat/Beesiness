@@ -17,11 +17,10 @@ export default function Login() {
         setActivationCreds(prevState=>({
             ...prevState,
             [key]: value
-        }))
-    }
+        }))}
 
-    const activate = async () => {
-        const result = await axios.post('http://192.168.56.1:8000/api/v2/auth/users/activation/', activationCreds,
+    const activateAcc = async () => {
+        await axios.post('http://192.168.1.13:8000/api/v2/auth/users/activation/', activationCreds,
         {headers:{
         'Content-Type':'application/JSON',
         'Referrer-Policy':'same-origin',
@@ -32,6 +31,7 @@ export default function Login() {
         .catch(error => {
             alert('Activation Unsuccessful')
         });
+
     }
         
 
@@ -68,7 +68,7 @@ export default function Login() {
                                activeUnderlineColor='#987554' 
                                onChangeText={(e)=>Activation('token', e)}/>
                     <Text style={{color:'white', margin:5, marginVertical:15}}>UID and Token sent! Please check your Email.</Text>
-                    <TouchableOpacity style={{alignItems:'center', justifyContent:'center', backgroundColor:'#fff4ac', padding:10, borderRadius:10}} onPress={()=>activate}>
+                    <TouchableOpacity style={{alignItems:'center', justifyContent:'center', backgroundColor:'#fff4ac', padding:10, borderRadius:10}} onPress={activateAcc}>
                         <Text style={{fontWeight:'bold'}}>Activate</Text>
                     </TouchableOpacity>
                     <View style={{flexDirection:'row', alignItems:'center', justifyContent:'flex-end', marginTop: 10, marginHorizontal:10}}>

@@ -9,7 +9,7 @@ export default function Router() {
   return (
     <Routes>
         <Route path='/' element={<Login/>} />
-        <Route path='/dash' element={<Dashboard/>} />
+        <Route path='/dash/:auth_token' element={<Dashboard/>} />
         <Route path='/signup' element={<Signup/>} />
         <Route path='/activate/:email' element={<Activation/>} />
     </Routes>
