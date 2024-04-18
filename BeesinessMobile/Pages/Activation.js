@@ -17,16 +17,11 @@ export default function Login() {
         setActivationCreds(prevState=>({
             ...prevState,
             [key]: value
-        })).then(response => {
-            navigation.navigate('Login')
-        })
-        .catch(error => {
-            alert('invalid id & token')
-        });
+        }))
     }
 
     const activate = async () => {
-        const result = await axios.post('http://10.0.254.16:8000/api/v2/auth/users/activation/', activationCreds,
+        const result = await axios.post('http://192.168.56.1:8000/api/v2/auth/users/activation/', activationCreds,
         {headers:{
         'Content-Type':'application/JSON',
         'Referrer-Policy':'same-origin',
