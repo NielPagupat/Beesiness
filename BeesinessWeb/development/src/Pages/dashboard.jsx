@@ -2,6 +2,7 @@ import * as React from 'react';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
+import { Button } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -11,11 +12,14 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Link from '@mui/material/Link';
+import Popover from '@mui/material/Popover';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import Avatar from '@mui/material/Avatar';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'
+import { AddCircleOutline, Assignment, NotificationsNone, } from '@mui/icons-material';
+import TopNavBar from '../Components/TopNavBar';
 
 const drawerWidth = 0;
 
@@ -74,61 +78,108 @@ export default function Dashboard() {
     return dateTimeParts[0];
   };
 
-  React.useEffect(()=>{
-    getUserAccountsList
-     // Refresh data every 3 seconds
-     const intervalId = setInterval(getUserAccountsList, 3000);
+  const [anchorEl, setAnchorEl] = React.useState(null);
 
-     // Clean up function to clear the interval
-     return () => clearInterval(intervalId);
-  }, [])
+  const handleOpenPopover = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClosePopover = () => {
+    setAnchorEl(null);
+  };
+
+  const openNotification = Boolean(anchorEl);
+
+  // React.useEffect(()=>{
+  //   getUserAccountsList
+  //    // Refresh data every 3 seconds
+  //    const intervalId = setInterval(getUserAccountsList, 3000);
+
+  //    // Clean up function to clear the interval
+  //    return () => clearInterval(intervalId);
+  // }, [])
   return (
-    <ThemeProvider theme={defaultTheme}>
-      <Box sx={{ display: 'flex' }}>
-        <CssBaseline/>
-        <AppBar position="absolute" open={open} sx={{backgroundImage: 'linear-gradient(45deg, #D28200 30%, #FBB23E 90%)'}}>
-          <Toolbar
-            sx={{pr: '245px',}}>
-            <Avatar sx={{ m: 1, width:50, height: 50}} src='../src/assets/beesiness.png'/>
-            <Typography
-              component="h1"
-              variant="h6"
-              color="inherit"
-              noWrap
-              sx={{ flexGrow: 1 }}
+    
+    <Box sx={{ display: 'flex', width: '100vw', height: '100vh' }}>
+      <CssBaseline/>
+      <TopNavBar handleOpenPopover={handleOpenPopover} toLogOut={toLogOut} />
+      <Box
+        component="main"
+        sx={{
+          background: 'radial-gradient(circle at 35% 70%, #333133, #1E191A)',
+          flexGrow: 1,
+          height: '100vh',
+          overflow: 'auto',
+          alignContent:'center',
+          backgroundImage: 'url("../src/assets/beehive.png")', // Set background image here
+          backgroundSize: 'cover', // Ensure the image covers the entire container
+          backgroundPosition: 'center', // Center the image
+        }}
+      >
+        {anchorEl && (
+          <Popover
+            open={open}
+            anchorEl={anchorEl}
+            onClose={handleClosePopover}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+          >
+            <Typography sx={{ p: 2 }}>Notifications content</Typography>
+          </Popover>
+        )}
+        <Toolbar />
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 , display:'flex', justifyContent:'center', alignContent:'center'}}>
+        
+          <Box
+            sx={{
+              backgroundColor: 'rgba(0, 0, 0, .5)',
+              height: '70vh',
+              width: '80vw',
+              display: 'flex',
+              flexDirection: 'column',
+              paddingTop:5,
+              paddingLeft:5,
+              boxShadow: '0px 0px 10px rgba(0, 0, 0, 1)' // adding drop shadow
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center', // center children horizontally
+                marginBottom: '20px' // spacing between child boxes
+              }}
             >
-              Beesiness
-            </Typography>
-            <IconButton onClick={toLogOut} color="inherit">
-              <Typography sx={{mx:'1vh', fontWeight:'bold'}}>
-                Log-out
-              </Typography>
-              <ExitToAppIcon />
-            </IconButton>
-          </Toolbar>
-        </AppBar>
-
-        <Box
-          component="main"
-          sx={{
-            background: 'radial-gradient(circle at 35% 70%, #333133, #1E191A)',
-            flexGrow: 1,
-            height: '100vh',
-            overflow: 'auto',
-          }}
-        >
-          <Toolbar />
-          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Typography sx={{color:'white', fontWeight:'bold', fontSize:20, my:2}}>User Lists</Typography>
-            {allUsers.map(obj => (
-                <Box sx={{backgroundImage: 'linear-gradient(45deg, #D28200 30%, #FBB23E 90%)', padding:2, margin:2, borderRadius:2}}>
-                    <Typography sx={{fontSize:18}}>Email: {obj.email}</Typography>
-                    <Typography sx={{fontSize:18}}>Last Login: {extractDate(obj.last_login)}</Typography>
-                </Box>   
-            ))}
-          </Container>
-        </Box>
+              <Button
+                sx={{ fontSize: '20px', marginRight: '10px', minWidth: 0 }}
+                startIcon={<AddCircleOutline style={{ fontSize: 100, color:'#D28200' }} />} // Increasing icon size to 40px
+              />
+              <Typography sx={{ color: 'white', fontSize: '20px' }}>Add Project</Typography>
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center' // center children horizontally
+              }}
+            >
+              <Button
+                sx={{ fontSize: '20px', marginRight: '10px', minWidth: 0 }}
+                startIcon={<Assignment style={{ fontSize: 100, color:'#D28200'}} />} // Increasing icon size to 40px
+              />
+              <Typography sx={{ color: 'white', fontSize: '20px' }}>Access Project</Typography>
+            </Box>
+          </Box>
+          
+        </Container>
       </Box>
-    </ThemeProvider>
+    </Box>
+  
   );
 }
