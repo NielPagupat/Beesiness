@@ -3,7 +3,7 @@ import React from 'react'
 import { Card, Avatar } from 'react-native-paper'
 import { useNavigation } from '@react-navigation/native';
 
-export default function TopNavigation({ userEmail, onPress }) {
+export default function TopNavigation({ userEmail, onPress, val }) {
   const navigation = useNavigation();
 
   const toLogOut = () => {
@@ -16,7 +16,7 @@ export default function TopNavigation({ userEmail, onPress }) {
         <Card.Content style={{flexDirection:'row', alignItems:'center'}}>
           <TouchableOpacity style={{flexDirection:'row', alignItems:'center'}} onPress={onPress}>
           <Avatar.Image size={50} source={require('../assets/beesiness.png')} style={{backgroundColor:'rgba(0,0,0,0)'}}/>
-          <Text style={{color:'white', marginHorizontal:5, fontSize:15}}>Beesiness</Text>
+          <Text style={{color:'white', marginHorizontal:5, fontSize:15}}>{val}</Text>
           </TouchableOpacity>
             <View style={{flex:1, alignItems:'center', justifyContent:'flex-end', flexDirection:'row'}}>
                 <Text style={{marginHorizontal:10, color:'white'}}>{userEmail}</Text>
