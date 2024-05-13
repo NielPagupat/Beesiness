@@ -37,7 +37,7 @@ export default function Login() {
     }
     
     const logIn = async() => {
-        const result = axios.post('http://192.168.1.13:8000/api/v2/auth/token/login/', credential, {
+        const result = axios.post('http://192.168.1.10:8000/api/v2/auth/token/login/', credential, {
             headers:{
                 'Content-Type':'application/JSON',
                 'Referrer-Policy':'same-origin',
