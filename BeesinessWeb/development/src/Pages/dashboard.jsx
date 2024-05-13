@@ -1,41 +1,23 @@
 import * as React from 'react';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import MuiDrawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Link from '@mui/material/Link';
-import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import Avatar from '@mui/material/Avatar';
 import { useParams } from 'react-router-dom';
-import { Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios'
 
-
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
-const drawerWidth = 240;
+const drawerWidth = 0;
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -55,36 +37,10 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open }) => ({
-    '& .MuiDrawer-paper': {
-      position: 'relative',
-      whiteSpace: 'nowrap',
-      width: drawerWidth,
-      transition: theme.transitions.create('width', {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      boxSizing: 'border-box',
-      ...(!open && {
-        overflowX: 'hidden',
-        transition: theme.transitions.create('width', {
-          easing: theme.transitions.easing.sharp,
-          duration: theme.transitions.duration.leavingScreen,
-        }),
-        width: theme.spacing(7),
-        [theme.breakpoints.up('sm')]: {
-          width: theme.spacing(9),
-        },
-      }),
-    },
-  }),
-);
-
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 export default function Dashboard() {
+  const navigate = useNavigate()
   const {auth_token} = useParams()
   const [allUsers, setAllUsers] = React.useState([])
   const [open, setOpen] = React.useState(true);
@@ -106,9 +62,17 @@ export default function Dashboard() {
   })
   }
 
-  const checkUsers = () => {
-    console.log(allUsers)
+  const toLogOut = () => {
+    navigate('/')
   }
+
+  const extractDate = (dateTimeString) => {
+    if (!dateTimeString) {
+      return "None"; 
+    }
+    const dateTimeParts = dateTimeString.split('T');
+    return dateTimeParts[0];
+  };
 
   React.useEffect(()=>{
     getUserAccountsList
@@ -121,25 +85,11 @@ export default function Dashboard() {
   return (
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: 'flex' }}>
-        <CssBaseline />
-        <AppBar position="absolute" open={open}>
+        <CssBaseline/>
+        <AppBar position="absolute" open={open} sx={{backgroundImage: 'linear-gradient(45deg, #D28200 30%, #FBB23E 90%)'}}>
           <Toolbar
-            sx={{
-              pr: '24px', // keep right padding when drawer closed
-            }}
-          >
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="open drawer"
-              onClick={toggleDrawer}
-              sx={{
-                marginRight: '36px',
-                ...(open && { display: 'none' }),
-              }}
-            >
-              <MenuIcon />
-            </IconButton>
+            sx={{pr: '245px',}}>
+            <Avatar sx={{ m: 1, width:50, height: 50}} src='../src/assets/beesiness.png'/>
             <Typography
               component="h1"
               variant="h6"
@@ -147,42 +97,21 @@ export default function Dashboard() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Dashboard
+              Beesiness
             </Typography>
-            <IconButton color="inherit">
-              <Badge badgeContent={4} color="secondary">
-                <NotificationsIcon />
-              </Badge>
+            <IconButton onClick={toLogOut} color="inherit">
+              <Typography sx={{mx:'1vh', fontWeight:'bold'}}>
+                Log-out
+              </Typography>
+              <ExitToAppIcon />
             </IconButton>
           </Toolbar>
         </AppBar>
-        <Drawer variant="permanent" open={open}>
-          <Toolbar
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              px: [1],
-            }}
-          >
-            <IconButton onClick={toggleDrawer}>
-              <ChevronLeftIcon />
-            </IconButton>
-          </Toolbar>
-          <Divider />
-          <List component="nav">
-    
-            <Divider sx={{ my: 1 }} />
-            {/* {secondaryListItems} */}
-          </List>
-        </Drawer>
+
         <Box
           component="main"
           sx={{
-            backgroundColor: (theme) =>
-              theme.palette.mode === 'light'
-                ? theme.palette.grey[100]
-                : theme.palette.grey[900],
+            background: 'radial-gradient(circle at 35% 70%, #333133, #1E191A)',
             flexGrow: 1,
             height: '100vh',
             overflow: 'auto',
@@ -190,50 +119,13 @@ export default function Dashboard() {
         >
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Grid container spacing={3}>
-              {/* Chart */}
-              <Grid item xs={12} md={8} lg={9}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: '240px', // Adjust the maximum height as needed
-                    overflowX: 'auto', // Enable horizontal scrolling
-                    overflowY: 'auto', // Enable vertical scrolling
-                  }}
-                >
-                {allUsers.map(obj => (
-                    <div key={obj.email} style={{ display: 'flex', flexDirection: 'row' }}>
-                        <Typography>Email: {obj.email}</Typography>
-                        <Typography>Last Login: {obj.last_login}</Typography>
-                    </div>
-                ))}
-                </Paper>
-              </Grid>
-              {/* Recent Deposits */}
-              <Grid item xs={12} md={4} lg={3}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                    overflowX: 'auto',
-                    overflowY: 'auto',
-                  }}
-                >
-                   
-                </Paper>
-              </Grid>
-              {/* Recent Orders */}
-              <Grid item xs={12}>
-                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  
-                </Paper>
-              </Grid>
-            </Grid>
-            <Copyright sx={{ pt: 4 }} />
+          <Typography sx={{color:'white', fontWeight:'bold', fontSize:20, my:2}}>User Lists</Typography>
+            {allUsers.map(obj => (
+                <Box sx={{backgroundImage: 'linear-gradient(45deg, #D28200 30%, #FBB23E 90%)', padding:2, margin:2, borderRadius:2}}>
+                    <Typography sx={{fontSize:18}}>Email: {obj.email}</Typography>
+                    <Typography sx={{fontSize:18}}>Last Login: {extractDate(obj.last_login)}</Typography>
+                </Box>   
+            ))}
           </Container>
         </Box>
       </Box>

@@ -3,8 +3,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Avatar, Card, Text, TextInput} from "react-native-paper";
 import Icon from 'react-native-vector-icons/FontAwesome';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useNavigation } from "@react-navigation/native";
-import DateTimePicker from '@react-native-community/datetimepicker'
 import axios from 'axios'
 export default function SignUp() {
     const navigation = useNavigation()
@@ -15,10 +15,11 @@ export default function SignUp() {
         "first_name": "",
         "last_name": "",
         "middle_initial": "",
-        "birthday": "2003-07-26",
+        "birthday": "1999-01-01",
         "gender": ""
     })
-    const [birthday, setBirthday] = useState(new Date());//no remove
+
+    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     
     const handleDataChange = (key, value) =>{
         setUserData(prevState => ({
@@ -27,7 +28,23 @@ export default function SignUp() {
         }))
     }
 
-   
+    
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (date) => {
+    setUserData(prevState => ({
+            ...prevState,
+            "birthday": date.toISOString().split('T')[0]
+        }));
+    hideDatePicker();
+  };
+
 
     const [pVisibility, setPVisibility] = useState(true)
     const [eyeIcon, setIcon] = useState('eye-off')
@@ -41,35 +58,14 @@ export default function SignUp() {
         }
     }
 
-    const [rePassVisible, setRePassVisible] = useState(true)
-    const [reEyeIcon, setReEyeIcon] = useState('eye-off')
-    const showRePass = () => {
-        if (rePassVisible == true) {
-            setRePassVisible(false)
-            setReEyeIcon('eye')
-        } else {
-            setRePassVisible(true)
-            setReEyeIcon('eye-off')
-        }
-    }
-
-    const [showDatePicker, setShowDatePicker] = useState(false);
-    const onChange = (event, birthday) => {
-        setShowDatePicker(false);
-        const year = birthday.getFullYear();
-        const month = String(birthday.getMonth() + 1).padStart(2, '0');
-        const day = String(birthday.getDate()).padStart(2, '0');
-        const birthdate = `${year}-${month}-${day}`;
-        console.log(birthdate)
-      };
-    
     const backToLogin = () => {
         navigation.navigate('Login');
     }
 
 
     const register = async() => {
-        const result = await axios.post('http://10.0.254.16:8000/api/v2/auth/users/', userData, 
+        console.log(userData)
+        const result = await axios.post('http://192.168.1.13:8000/api/v2/auth/users/', userData, 
         {headers:{
         'Content-Type':'application/JSON',
         'Referrer-Policy':'same-origin',
@@ -80,6 +76,7 @@ export default function SignUp() {
         .catch(error => {
             alert('Sign-In Unsuccessful ', error)
         });
+        
     }
 
 
@@ -124,10 +121,7 @@ export default function SignUp() {
                                        activeUnderlineColor="#987554" 
                                        style={styles.textInputs} 
                                        label="Re-enter Password" 
-                                       secureTextEntry={rePassVisible}  
-                                       right={<TextInput.Icon 
-                                       icon={reEyeIcon} 
-                                       onPress={showRePass}/>}
+                                       secureTextEntry={pVisibility}  
                                        onChangeText={(e)=>handleDataChange('confirm_password', e)}/>
                         </View>
                         <View style={styles.inputBoxes}>
@@ -165,21 +159,20 @@ export default function SignUp() {
                             </View>
                         </View>
                         <View style={styles.inputBoxes}>
-                        <TouchableOpacity style={{backgroundColor: 'white', borderRadius:10, height:50, justifyContent:'center'}} onPress={() => setShowDatePicker(true)}>
+                        <TouchableOpacity style={{backgroundColor: 'white', borderRadius:10, height:50, justifyContent:'center'}} onPress={showDatePicker}>
                         <Text style={{marginLeft:15, color:'gray'}}>
                             Birth Date:
                         </Text>
                         <Text style={{marginLeft:15, fontSize:16}}>
-                            {birthday.toDateString()}
+                            {userData.birthday}
                         </Text>
-                        {showDatePicker && (
-                            <DateTimePicker
-                            value={birthday} 
+                        <DateTimePickerModal
+                            isVisible={isDatePickerVisible}
                             mode="date"
-                            display="calendar"
-                            onChangeText={onChange}
-                            />
-                        )}
+                            onChange={(e)=>handleDataChange('birthday', e)}
+                            onConfirm={handleConfirm}
+                            onCancel={hideDatePicker}
+                        />
                         </TouchableOpacity>
                         </View>
                         <View style={{flexDirection: "row", justifyContent:'center', alignItems:'center', marginTop: 20, marginHorizontal:10}}>

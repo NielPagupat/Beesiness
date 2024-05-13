@@ -20,7 +20,7 @@ export default function Login() {
         }))}
 
     const activateAcc = async () => {
-        await axios.post('http://10.0.254.16:8000/api/v2/auth/users/activation/', activationCreds,
+        await axios.post('http://192.168.1.13:8000/api/v2/auth/users/activation/', activationCreds,
         {headers:{
         'Content-Type':'application/JSON',
         'Referrer-Policy':'same-origin',
