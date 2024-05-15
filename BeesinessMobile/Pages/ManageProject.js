@@ -19,6 +19,10 @@ export default function ManageProject() {
         navigation.navigate('Dashboard');
       }
 
+    const toProjecttemp = () => {
+        navigation.navigate('ProjectAsLeader')
+    }
+
   return (
     <View style={styles.container}>
         <ImageBackground source={require('../assets/wallpaper.png')} style={{flex: 1, resizeMode: "cover", justifyContent: "center", paddingTop: StatusBar.currentHeight,}}>
@@ -29,13 +33,13 @@ export default function ManageProject() {
             <View style={{backgroundColor:'#C19A6B', borderRadius:10, paddingBottom:40, elevation:5}}>
                 <TouchableOpacity onPress={toDashboard} style={{flexDirection:'row', alignItems:'center'}}>
                     <IconButton icon="chevron-left" size={40} />
-                    <Text style={{color:'#303030', fontSize:14}}>To Dashboard</Text>
+                    <Text style={{color:'#303030', fontSize:14}}>Dashboard</Text>
                 </TouchableOpacity>
                 <View>
                     <View style={{margin:20, marginHorizontal:30}}>
                         <Text style={{color:'#303030', fontSize:20, fontWeight:'bold'}}>Your Projects: </Text>
                         <View style={{margin:5}}>
-                            <TouchableOpacity style={{backgroundColor:'#fff', borderRadius:5, padding:10, marginVertical:5}}>
+                            <TouchableOpacity onPress={toProjecttemp} style={{backgroundColor:'#fff', borderRadius:5, padding:10, marginVertical:5}}>
                                 <Text>project_name</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={{backgroundColor:'#fff', borderRadius:5, padding:10, marginVertical:5}}>
