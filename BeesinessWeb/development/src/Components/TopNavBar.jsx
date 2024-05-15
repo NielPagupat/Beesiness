@@ -10,7 +10,7 @@ const TopNavBar = ({ handleOpenPopover, handleClosePopover, anchorEl, toLogOut }
     <React.Fragment>
       <AppBar position="absolute" sx={{backgroundImage: 'linear-gradient(45deg, #D28200 30%, #FBB23E 90%)'}}>
         <Toolbar sx={{pr: '245px',}}>
-          <Avatar sx={{ m: 1, width:50, height: 50}} src='../src/assets/beesiness.png'/>
+          <Avatar sx={{ m: 1, width:50, height: 50}} src='/src/assets/beesiness.png'/>
           <Typography
             component="h1"
             variant="h6"

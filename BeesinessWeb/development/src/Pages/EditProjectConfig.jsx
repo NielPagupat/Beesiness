@@ -29,7 +29,7 @@ const textFieldStyle = {
   },
 }
 
-export default function AddProject() {
+export default function EditProject() {
   const [anchorEl, setAnchorEl] = React.useState(null)
   const navigate = useNavigate()
 
@@ -172,12 +172,7 @@ export default function AddProject() {
           >
             {/* For Inputs */}
             <Box sx={{ display: 'flex', flex: 1, flexDirection: 'column', marginRight: 2 }}>
-              <TextField
-                label="Project Name"
-                value={project.projectName}
-                onChange={(e) => handleProjectUpdate('projectName', e.target.value)}
-                sx={{ ...textFieldStyle, width: '100%', marginBottom: 5 }}
-              />
+              <Typography sx={{color:'white', fontSize:20}}>Project Name</Typography>
               {/* Put Members Here */}
               {members.length > 0 ? (
                 <Box
@@ -185,6 +180,7 @@ export default function AddProject() {
                     height: '60%',
                     overflowY: 'auto',
                     marginBottom: '10px',
+                    m:2,
                   }}
                 >
                   {members.map((member, index) => (
@@ -216,6 +212,7 @@ export default function AddProject() {
                     height: '60%',
                     overflowY: 'auto',
                     marginBottom: '10px',
+                    m:2
                   }}
                 >
                   <Typography sx={{ color: 'white' }}>No members added yet</Typography>
