@@ -1,10 +1,10 @@
-import React from 'react'
-import TopNavBar from '../Components/TopNavBar'
-import { Box, CssBaseline, Typography, Container, TextField, Button, Popover, IconButton } from '@mui/material'
-import { useNavigate, useLocation } from 'react-router-dom'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
-import axios from 'axios'
+import React from 'react';
+import TopNavBar from '../Components/TopNavBar';
+import { Box, CssBaseline, Typography, Container, TextField, Button, Popover, IconButton } from '@mui/material';
+import { useNavigate, useLocation } from 'react-router-dom';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import axios from 'axios';
 
 const textFieldStyle = {
   '& .MuiInputBase-input': {
@@ -27,124 +27,129 @@ const textFieldStyle = {
       borderColor: 'orange',
     },
   },
-}
+};
 
 export default function EditProject() {
-  const [anchorEl, setAnchorEl] = React.useState(null)
-  const navigate = useNavigate()
-  const location = useLocation()
-  const { project } = location.state
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { project } = location.state;
 
   const handleOpenPopover = (event) => {
-    setAnchorEl(event.currentTarget)
-  }
+    setAnchorEl(event.currentTarget);
+  };
 
   const handleClosePopover = () => {
-    setAnchorEl(null)
-  }
+    setAnchorEl(null);
+  };
 
   const toLogOut = () => {
-    navigate('/')
-  }
+    navigate('/');
+  };
 
   const [projectState, setProjectState] = React.useState({
     projectName: project.projectName || '',
     creator: project.creator || '',
     members: project.members || [],
-  })
+  });
 
   const handleProjectUpdate = (key, value) => {
     setProjectState(prevState => ({
       ...prevState,
       [key]: value,
-    }))
-  }
+    }));
+  };
 
-  const [member, setMember] = React.useState('')
-  const [selectedMemberIndex, setSelectedMemberIndex] = React.useState(null)
+  const [member, setMember] = React.useState('');
+  const [selectedMemberIndex, setSelectedMemberIndex] = React.useState(null);
   const [task, setTask] = React.useState({
-    comment:[],
+    comment: [],
     taskname: '',
     taskDescription: '',
     startdate: '',
     endDate: '',
     status: false,
-  })
+  });
 
   const addMember = () => {
     setProjectState(prevState => ({
       ...prevState,
-      members: [...prevState.members, { name: member, tasks: [] }]
-    }))
-    setMember('')
-  }
+      members: [...prevState.members, { name: member, tasks: [], comment:[], }],
+    }));
+    setMember('');
+  };
 
   const handleRemoveMember = (index) => {
     setProjectState(prevState => {
-      const updatedMembers = [...prevState.members]
-      updatedMembers.splice(index, 1)
-      return { ...prevState, members: updatedMembers }
-    })
-    setSelectedMemberIndex(null)
-  }
+      const updatedMembers = [...prevState.members];
+      updatedMembers.splice(index, 1);
+      return { ...prevState, members: updatedMembers };
+    });
+    setSelectedMemberIndex(null);
+  };
 
   const handleEditMember = (index) => {
-    setSelectedMemberIndex(index)
-  }
+    setSelectedMemberIndex(index);
+  };
 
   const addTaskToMember = () => {
     if (selectedMemberIndex !== null) {
       setProjectState(prevState => {
-        const updatedMembers = [...prevState.members]
-        updatedMembers[selectedMemberIndex].tasks.push(task)
-        return { ...prevState, members: updatedMembers }
-      })
+        const updatedMembers = [...prevState.members];
+        updatedMembers[selectedMemberIndex].tasks.push(task);
+        return { ...prevState, members: updatedMembers };
+      });
       setTask({
         taskname: '',
         taskDescription: '',
         startdate: '',
         endDate: '',
         status: false,
-      })
+      });
     }
-  }
+  };
 
   const handleRemoveTask = (taskIndex) => {
     if (selectedMemberIndex !== null) {
       setProjectState(prevState => {
-        const updatedMembers = [...prevState.members]
-        updatedMembers[selectedMemberIndex].tasks.splice(taskIndex, 1)
-        return { ...prevState, members: updatedMembers }
-      })
+        const updatedMembers = [...prevState.members];
+        updatedMembers[selectedMemberIndex].tasks.splice(taskIndex, 1);
+        return { ...prevState, members: updatedMembers };
+      });
     }
-  }
+  };
 
-  const saveProject = async() => {
+  const saveProject = async () => {
     await axios.put(`http://localhost:8000/api/v2/auth/editProject/${project.id}/`, projectState, {
-      headers:{
+      headers: {
         'Content-Type': 'application/JSON',
         'Referrer-Policy': 'same-origin',
         'Cross-Origin-Opener-Policy': 'same-origin',
-      }
-    }).then(response=>{
-      console.log(response)
-      }).catch(error=>{
-        alert(error)
-      })
-    console.log(projectState)
-  }
+      },
+    }).then(response => {
+      console.log(response);
+    }).catch(error => {
+      alert(error);
+    });
+    console.log(projectState);
+  };
 
   const handleTaskUpdate = (key, value) => {
     setTask(prevState => ({
       ...prevState,
       [key]: value,
-    }))
-  }
+    }));
+  };
+
+  const viewMemberProgress = (index) => {
+    const memberData = projectState.members[index];
+    navigate('/TaskProgress', { state: { member: memberData, projectName: projectState.projectName, projectID:project.id } });
+  };
+
   return (
     <>
       <CssBaseline />
       <TopNavBar handleOpenPopover={handleOpenPopover} toLogOut={toLogOut} />
-      
       <Box
         component="main"
         sx={{
@@ -188,23 +193,22 @@ export default function EditProject() {
               boxShadow: '0px 0px 10px rgba(0, 0, 0, 1)',
             }}
           >
-            {/* For Inputs */}
             <Box sx={{ display: 'flex', flex: 1, flexDirection: 'column', marginRight: 2 }}>
-              <Typography sx={{color:'white', fontSize:20}}>Project Name</Typography>
-              <TextField 
-                value={projectState.projectName} 
-                onChange={(e) => handleProjectUpdate('projectName', e.target.value)} 
-                sx={{ ...textFieldStyle, mb: 2 }} 
+              <Typography sx={{ color: 'white', fontSize: 20 }}>Project Name</Typography>
+              <TextField
+                value={projectState.projectName}
+                onChange={(e) => handleProjectUpdate('projectName', e.target.value)}
+                sx={{ ...textFieldStyle, mb: 2 }}
                 fullWidth
               />
-              <Typography sx={{color:'white', fontSize:20, mt: 2}}>Members</Typography>
+              <Typography sx={{ color: 'white', fontSize: 20, mt: 2 }}>Members</Typography>
               {projectState.members.length > 0 ? (
                 <Box
                   sx={{
                     height: '60%',
                     overflowY: 'auto',
                     marginBottom: '10px',
-                    m:2,
+                    m: 2,
                   }}
                 >
                   {projectState.members.map((member, index) => (
@@ -227,7 +231,7 @@ export default function EditProject() {
                       <IconButton onClick={() => handleRemoveMember(index)}>
                         <DeleteIcon style={{ color: 'red' }} />
                       </IconButton>
-                      <Button>See Member Progress</Button>
+                      <Button onClick={() => viewMemberProgress(index)}>See Member Progress</Button>
                     </Box>
                   ))}
                 </Box>
@@ -237,7 +241,7 @@ export default function EditProject() {
                     height: '60%',
                     overflowY: 'auto',
                     marginBottom: '10px',
-                    m:2
+                    m: 2,
                   }}
                 >
                   <Typography sx={{ color: 'white' }}>No members added yet</Typography>
@@ -254,7 +258,6 @@ export default function EditProject() {
               </Box>
               <Button onClick={saveProject}>Save</Button>
             </Box>
-            {/* Add task Box */}
             <Box sx={{ display: 'flex', flex: 1, flexDirection: 'column', paddingLeft: 5, paddingTop: 5, border: '2px solid orange' }}>
               <Typography sx={{ color: 'white' }}>Task Details</Typography>
               <Box
@@ -266,53 +269,54 @@ export default function EditProject() {
                 }}
               >
                 {selectedMemberIndex !== null && projectState.members[selectedMemberIndex].tasks.length > 0 ? (
-                  projectState.members[selectedMemberIndex].tasks.map((task, index) => (
-                    <Box key={index} sx={{ marginBottom: '10px', color: 'white', display:'flex', alignItems:'center'}}>
+                  projectState.members[selectedMemberIndex].tasks                    .map((task, index) => (
+                    <Box key={index} sx={{ marginBottom: '10px', color: 'white', display: 'flex', alignItems: 'center' }}>
                       <Typography>Task {index + 1}: {task.taskname}</Typography>
                       <IconButton onClick={() => handleRemoveTask(index)}>
                         <DeleteIcon style={{ color: 'red' }} />
                       </IconButton>
                     </Box>
                   ))
-                ) : (
-                  <Typography color="white">No tasks yet</Typography>
-                )}
-              </Box>
-              <Box flexDirection={'row'}>
-                <TextField 
-                  label="TaskName" 
-                  value={task.taskname} 
-                  onChange={(e) => handleTaskUpdate('taskname', e.target.value)} 
-                  sx={{ ...textFieldStyle, m: 1 }} 
-                />
-                <TextField 
-                  label="Task Description" 
-                  multiline={true} 
-                  maxRows={1} 
-                  value={task.taskDescription} 
-                  onChange={(e) => handleTaskUpdate('taskDescription', e.target.value)} 
-                  sx={{ ...textFieldStyle, m: 1 }} 
-                />
-                <TextField 
-                  type="date"
-                  helperText="Start Date" 
-                  value={task.startdate} 
-                  onChange={(e) => handleTaskUpdate('startdate', e.target.value)} 
-                  sx={{ ...textFieldStyle, m: 1, color: 'white', '& .MuiFormHelperText-root': { color: 'white' } }} 
-                />
-                <TextField 
-                  type="date" 
-                  helperText="End Date" 
-                  value={task.endDate} 
-                  onChange={(e) => handleTaskUpdate('endDate', e.target.value)} 
-                  sx={{ ...textFieldStyle, m: 1, color: 'white', '& .MuiFormHelperText-root': { color: 'white' } }} 
-                />
-                <Button onClick={addTaskToMember}>Add Task</Button>
-              </Box>
+              ) : (
+                <Typography color="white">No tasks yet</Typography>
+              )}
+            </Box>
+            <Box flexDirection={'row'}>
+              <TextField 
+                label="TaskName" 
+                value={task.taskname} 
+                onChange={(e) => handleTaskUpdate('taskname', e.target.value)} 
+                sx={{ ...textFieldStyle, m: 1 }} 
+              />
+              <TextField 
+                label="Task Description" 
+                multiline={true} 
+                maxRows={1} 
+                value={task.taskDescription} 
+                onChange={(e) => handleTaskUpdate('taskDescription', e.target.value)} 
+                sx={{ ...textFieldStyle, m: 1 }} 
+              />
+              <TextField 
+                type="date"
+                helperText="Start Date" 
+                value={task.startdate} 
+                onChange={(e) => handleTaskUpdate('startdate', e.target.value)} 
+                sx={{ ...textFieldStyle, m: 1, color: 'white', '& .MuiFormHelperText-root': { color: 'white' } }} 
+              />
+              <TextField 
+                type="date" 
+                helperText="End Date" 
+                value={task.endDate} 
+                onChange={(e) => handleTaskUpdate('endDate', e.target.value)} 
+                sx={{ ...textFieldStyle, m: 1, color: 'white', '& .MuiFormHelperText-root': { color: 'white' } }} 
+              />
+              <Button onClick={addTaskToMember}>Add Task</Button>
             </Box>
           </Box>
-        </Container>
-      </Box>
-    </>
-  )
+        </Box>
+      </Container>
+    </Box>
+  </>
+);
 }
+
