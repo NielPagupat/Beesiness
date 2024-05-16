@@ -1,52 +1,66 @@
-import React from 'react'
-import TopNavBar from '../Components/TopNavBar'
-import { Box, CssBaseline, Typography, Container, TextField, Button, Popover, IconButton } from '@mui/material'
-import { useNavigate } from 'react-router-dom'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
-import { useParams } from 'react-router-dom'
-
-const textFieldStyle = {
-  '& .MuiInputBase-input': {
-    color: 'white',
-  },
-  '& label': {
-    color: 'white',
-  },
-  '& .MuiInputLabel-root.Mui-focused': {
-    color: 'orange',
-  },
-  '& .MuiOutlinedInput-root': {
-    '& fieldset': {
-      borderColor: 'orange',
-    },
-    '&:hover fieldset': {
-      borderColor: 'orange',
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: 'orange',
-    },
-  },
-}
+import React, { useEffect } from 'react';
+import TopNavBar from '../Components/TopNavBar';
+import { Box, CssBaseline, Typography, Container, Popover, Button } from '@mui/material';
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 
 export default function OpenProject() {
-  const [anchorEl, setAnchorEl] = React.useState(null)
-  const navigate = useNavigate()
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const navigate = useNavigate();
+  const { email } = useParams();
+  const [myProjects, setMyProjects] = React.useState([]);
+  const [myCollaborations, setMyCollaborations] = React.useState([]);
 
   const handleOpenPopover = (event) => {
-    setAnchorEl(event.currentTarget)
-  }
+    setAnchorEl(event.currentTarget);
+  };
 
   const handleClosePopover = () => {
-    setAnchorEl(null)
-  }
+    setAnchorEl(null);
+  };
 
   const toLogOut = () => {
-    navigate('/')
-  }
+    navigate('/');
+  };
 
-  const { email } = useParams()
-  
+  const getMyProjects = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/v2/auth/projects/creator/${email}`, {
+        headers: {
+          'Content-Type': 'application/JSON',
+          'Referrer-Policy': 'same-origin',
+          'Cross-Origin-Opener-Policy': 'same-origin',
+        },
+      });
+      setMyProjects(response.data);
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  const getMyCollaborations = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/v2/auth/projects/member/${email}`, {
+        headers: {
+          'Content-Type': 'application/JSON',
+          'Referrer-Policy': 'same-origin',
+          'Cross-Origin-Opener-Policy': 'same-origin',
+        },
+      });
+      setMyCollaborations(response.data);
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  useEffect(() => {
+    getMyProjects();
+    getMyCollaborations();
+  }, []);
+
+  const goToEditProject = (project) => {
+    navigate('/editProject', { state: { project } });
+  };
 
   return (
     <>
@@ -84,26 +98,52 @@ export default function OpenProject() {
           </Popover>
         )}
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center', alignContent: 'center' }}>
-            <Box
-                sx={{
-                backgroundColor: 'rgba(0, 0, 0, .5)',
-                height: '70vh',
-                width: '80vw',
-                display: 'flex',
-                flexDirection: 'row',
-                padding:2,
-                boxShadow: '0px 0px 10px rgba(0, 0, 0, 1)',
-                }}
-            >
-                <Box sx={{flex:1, border: '2px solid orange', margin:1, p:1}}>
-                    <Typography sx={{color:'white'}}>My Projects</Typography>
-                </Box>
-                <Box sx={{flex:1, border: '2px solid orange', margin:1, p:1 }}>
-                    <Typography sx={{color:'white'}}>My Collaborations</Typography>
-                </Box>
+          <Box
+            sx={{
+              backgroundColor: 'rgba(0, 0, 0, .5)',
+              height: '70vh',
+              width: '80vw',
+              display: 'flex',
+              flexDirection: 'row',
+              padding: 2,
+              boxShadow: '0px 0px 10px rgba(0, 0, 0, 1)',
+            }}
+          >
+            <Box sx={{ flex: 1, border: '2px solid orange', margin: 1, p: 1 }}>
+              <Typography sx={{ color: 'white', marginBottom: 2, fontSize: 30 }}>My Projects</Typography>
+              <Box sx={{ height: 'calc(100% - 32px)', overflowY: 'auto' }}>
+                {myProjects.length > 0 ? (
+                  myProjects.map((project) => (
+                    <Button
+                      key={project.id}
+                      onClick={() => goToEditProject(project)}
+                      sx={{ color: 'white', marginBottom: 2, marginLeft: 5 }}
+                    >
+                      {project.projectName}
+                    </Button>
+                  ))
+                ) : (
+                  <Typography sx={{ color: 'white' }}>No projects available</Typography>
+                )}
+              </Box>
             </Box>
+            <Box sx={{ flex: 1, border: '2px solid orange', margin: 1, p: 1 }}>
+              <Typography sx={{ color: 'white', marginBottom: 2, fontSize: 30 }}>My Collaborations</Typography>
+              <Box sx={{ height: 'calc(100% - 32px)', overflowY: 'auto' }}>
+                {myCollaborations.length > 0 ? (
+                  myCollaborations.map((collab) => (
+                    <Typography key={collab.id} sx={{ color: 'white', marginBottom: 2, marginLeft: 5 }}>
+                      {collab.projectName} ----- {collab.creator}
+                    </Typography>
+                  ))
+                ) : (
+                  <Typography sx={{ color: 'white' }}>No collaborations available</Typography>
+                )}
+              </Box>
+            </Box>
+          </Box>
         </Container>
       </Box>
     </>
-  )
+  );
 }

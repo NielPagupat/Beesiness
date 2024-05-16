@@ -1,10 +1,10 @@
 import React from 'react'
 import TopNavBar from '../Components/TopNavBar'
 import { Box, CssBaseline, Typography, Container, TextField, Button, Popover, IconButton } from '@mui/material'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { useParams } from 'react-router-dom'
+import axios from 'axios'
 
 const textFieldStyle = {
   '& .MuiInputBase-input': {
@@ -32,6 +32,8 @@ const textFieldStyle = {
 export default function EditProject() {
   const [anchorEl, setAnchorEl] = React.useState(null)
   const navigate = useNavigate()
+  const location = useLocation()
+  const { project } = location.state
 
   const handleOpenPopover = (event) => {
     setAnchorEl(event.currentTarget)
@@ -45,24 +47,23 @@ export default function EditProject() {
     navigate('/')
   }
 
-  const { email } = useParams()
-  const [project, setProject] = React.useState({
-    projectName: '',
-    creator: email,
-    members: [],
+  const [projectState, setProjectState] = React.useState({
+    projectName: project.projectName || '',
+    creator: project.creator || '',
+    members: project.members || [],
   })
 
   const handleProjectUpdate = (key, value) => {
-    setProject(prevState => ({
+    setProjectState(prevState => ({
       ...prevState,
       [key]: value,
     }))
   }
 
   const [member, setMember] = React.useState('')
-  const [members, setMembers] = React.useState([])
   const [selectedMemberIndex, setSelectedMemberIndex] = React.useState(null)
   const [task, setTask] = React.useState({
+    comment:[],
     taskname: '',
     taskDescription: '',
     startdate: '',
@@ -70,27 +71,19 @@ export default function EditProject() {
     status: false,
   })
 
-  React.useEffect(() => {
-    handleProjectUpdate('members', members)
-  }, [members])
-
-  const handleTaskUpdate = (key, value) => {
-    setTask(prevState => ({
-      ...prevState,
-      [key]: value,
-    }))
-  }
-
   const addMember = () => {
-    setMembers(prevMembers => [...prevMembers, { name: member, tasks: [] }])
+    setProjectState(prevState => ({
+      ...prevState,
+      members: [...prevState.members, { name: member, tasks: [] }]
+    }))
     setMember('')
   }
 
   const handleRemoveMember = (index) => {
-    setMembers(prevMembers => {
-      const updatedMembers = [...prevMembers]
+    setProjectState(prevState => {
+      const updatedMembers = [...prevState.members]
       updatedMembers.splice(index, 1)
-      return updatedMembers
+      return { ...prevState, members: updatedMembers }
     })
     setSelectedMemberIndex(null)
   }
@@ -101,9 +94,11 @@ export default function EditProject() {
 
   const addTaskToMember = () => {
     if (selectedMemberIndex !== null) {
-      const updatedMembers = [...members]
-      updatedMembers[selectedMemberIndex].tasks.push(task)
-      setMembers(updatedMembers)
+      setProjectState(prevState => {
+        const updatedMembers = [...prevState.members]
+        updatedMembers[selectedMemberIndex].tasks.push(task)
+        return { ...prevState, members: updatedMembers }
+      })
       setTask({
         taskname: '',
         taskDescription: '',
@@ -116,12 +111,35 @@ export default function EditProject() {
 
   const handleRemoveTask = (taskIndex) => {
     if (selectedMemberIndex !== null) {
-      const updatedMembers = [...members]
-      updatedMembers[selectedMemberIndex].tasks.splice(taskIndex, 1)
-      setMembers(updatedMembers)
+      setProjectState(prevState => {
+        const updatedMembers = [...prevState.members]
+        updatedMembers[selectedMemberIndex].tasks.splice(taskIndex, 1)
+        return { ...prevState, members: updatedMembers }
+      })
     }
   }
 
+  const saveProject = async() => {
+    await axios.put(`http://localhost:8000/api/v2/auth/editProject/${project.id}/`, projectState, {
+      headers:{
+        'Content-Type': 'application/JSON',
+        'Referrer-Policy': 'same-origin',
+        'Cross-Origin-Opener-Policy': 'same-origin',
+      }
+    }).then(response=>{
+      console.log(response)
+      }).catch(error=>{
+        alert(error)
+      })
+    console.log(projectState)
+  }
+
+  const handleTaskUpdate = (key, value) => {
+    setTask(prevState => ({
+      ...prevState,
+      [key]: value,
+    }))
+  }
   return (
     <>
       <CssBaseline />
@@ -173,8 +191,14 @@ export default function EditProject() {
             {/* For Inputs */}
             <Box sx={{ display: 'flex', flex: 1, flexDirection: 'column', marginRight: 2 }}>
               <Typography sx={{color:'white', fontSize:20}}>Project Name</Typography>
-              {/* Put Members Here */}
-              {members.length > 0 ? (
+              <TextField 
+                value={projectState.projectName} 
+                onChange={(e) => handleProjectUpdate('projectName', e.target.value)} 
+                sx={{ ...textFieldStyle, mb: 2 }} 
+                fullWidth
+              />
+              <Typography sx={{color:'white', fontSize:20, mt: 2}}>Members</Typography>
+              {projectState.members.length > 0 ? (
                 <Box
                   sx={{
                     height: '60%',
@@ -183,7 +207,7 @@ export default function EditProject() {
                     m:2,
                   }}
                 >
-                  {members.map((member, index) => (
+                  {projectState.members.map((member, index) => (
                     <Box
                       key={index}
                       sx={{
@@ -203,6 +227,7 @@ export default function EditProject() {
                       <IconButton onClick={() => handleRemoveMember(index)}>
                         <DeleteIcon style={{ color: 'red' }} />
                       </IconButton>
+                      <Button>See Member Progress</Button>
                     </Box>
                   ))}
                 </Box>
@@ -227,6 +252,7 @@ export default function EditProject() {
                 />
                 <Button onClick={addMember}>Add Member</Button>
               </Box>
+              <Button onClick={saveProject}>Save</Button>
             </Box>
             {/* Add task Box */}
             <Box sx={{ display: 'flex', flex: 1, flexDirection: 'column', paddingLeft: 5, paddingTop: 5, border: '2px solid orange' }}>
@@ -239,8 +265,8 @@ export default function EditProject() {
                   p: 5,
                 }}
               >
-                {selectedMemberIndex !== null && members[selectedMemberIndex].tasks.length > 0 ? (
-                  members[selectedMemberIndex].tasks.map((task, index) => (
+                {selectedMemberIndex !== null && projectState.members[selectedMemberIndex].tasks.length > 0 ? (
+                  projectState.members[selectedMemberIndex].tasks.map((task, index) => (
                     <Box key={index} sx={{ marginBottom: '10px', color: 'white', display:'flex', alignItems:'center'}}>
                       <Typography>Task {index + 1}: {task.taskname}</Typography>
                       <IconButton onClick={() => handleRemoveTask(index)}>
@@ -290,5 +316,3 @@ export default function EditProject() {
     </>
   )
 }
-
-                  

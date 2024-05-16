@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useParams } from 'react-router-dom'
+import axios from 'axios'
 
 const textFieldStyle = {
   '& .MuiInputBase-input': {
@@ -47,9 +48,9 @@ export default function AddProject() {
 
   const { email } = useParams()
   const [project, setProject] = React.useState({
-    projectName: '',
-    creator: email,
-    members: [],
+    "projectName": '',
+    "creator": email,
+    "members": [],
   })
 
   const handleProjectUpdate = (key, value) => {
@@ -67,6 +68,7 @@ export default function AddProject() {
     taskDescription: '',
     startdate: '',
     endDate: '',
+    comment:[],
     status: false,
   })
 
@@ -121,6 +123,19 @@ export default function AddProject() {
       setMembers(updatedMembers)
     }
   }
+
+  const saveProjectData = async () => {
+    await axios.post('http://localhost:8000/api/v2/auth/createProject/', project, 
+    {headers:{
+      'Content-Type':'application/JSON',
+      'Referrer-Policy':'same-origin',
+      'Cross-Origin-Opener-Policy':'same-origin'
+    }}).then(response=>{
+      console.log(response)
+  }).catch(error=>{
+    alert(error)
+  })
+}
 
   return (
     <>
@@ -230,6 +245,7 @@ export default function AddProject() {
                 />
                 <Button onClick={addMember}>Add Member</Button>
               </Box>
+              <Button onClick={saveProjectData}> Save Project </Button>
             </Box>
             {/* Add task Box */}
             <Box sx={{ display: 'flex', flex: 1, flexDirection: 'column', paddingLeft: 5, paddingTop: 5, border: '2px solid orange' }}>
@@ -287,7 +303,9 @@ export default function AddProject() {
                 <Button onClick={addTaskToMember}>Add Task</Button>
               </Box>
             </Box>
+            
           </Box>
+          
         </Container>
       </Box>
     </>
