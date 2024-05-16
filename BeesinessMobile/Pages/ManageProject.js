@@ -23,6 +23,9 @@ export default function ManageProject() {
         navigation.navigate('ProjectAsLeader')
     }
 
+    const toProjectmemtemp = () => {
+        navigation.navigate('ProjectAsMember')
+    }
   return (
     <View style={styles.container}>
         <ImageBackground source={require('../assets/wallpaper.png')} style={{flex: 1, resizeMode: "cover", justifyContent: "center", paddingTop: StatusBar.currentHeight,}}>
@@ -54,7 +57,7 @@ export default function ManageProject() {
                     <View style={{margin:10, marginHorizontal:30}}>
                         <Text style={{color:'#303030', fontSize:20, fontWeight:'bold'}}>Project Collaborations: </Text>
                         <View style={{margin:5}}>
-                            <TouchableOpacity style={{backgroundColor:'#fff', borderRadius:5, padding:10, marginVertical:5, flexDirection:'row', justifyContent:'space-between'}}>
+                            <TouchableOpacity onPress={toProjectmemtemp} style={{backgroundColor:'#fff', borderRadius:5, padding:10, marginVertical:5, flexDirection:'row', justifyContent:'space-between'}}>
                                 <Text>project_name</Text>
                                 <Text>w/ Niel, 5+ users</Text>
                             </TouchableOpacity>
