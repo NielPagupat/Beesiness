@@ -68,7 +68,6 @@ export default function AddProject() {
     taskDescription: '',
     startdate: '',
     endDate: '',
-    comment:[],
     status: false,
   })
 
@@ -84,7 +83,7 @@ export default function AddProject() {
   }
 
   const addMember = () => {
-    setMembers(prevMembers => [...prevMembers, { name: member, tasks: [] }])
+    setMembers(prevMembers => [...prevMembers, { name: member, tasks: [], comment:[],}])
     setMember('')
   }
 
