@@ -62,6 +62,10 @@ export default function OpenProject() {
     navigate('/editProject', { state: { project } });
   };
 
+  const goToProjectDetailAsMember = (project) => {
+    navigate('/projectDetailMember', { state: { project, email } });
+  };
+
   return (
     <>
       <CssBaseline />
@@ -132,9 +136,13 @@ export default function OpenProject() {
               <Box sx={{ height: 'calc(100% - 32px)', overflowY: 'auto' }}>
                 {myCollaborations.length > 0 ? (
                   myCollaborations.map((collab) => (
-                    <Typography key={collab.id} sx={{ color: 'white', marginBottom: 2, marginLeft: 5 }}>
+                    <Button
+                      key={collab.id}
+                      onClick={() => goToProjectDetailAsMember(collab)}
+                      sx={{ color: 'white', marginBottom: 2, marginLeft: 5 }}
+                    >
                       {collab.projectName} ----- {collab.creator}
-                    </Typography>
+                    </Button>
                   ))
                 ) : (
                   <Typography sx={{ color: 'white' }}>No collaborations available</Typography>

@@ -1,58 +1,77 @@
-import React from 'react'
-import TopNavBar from '../Components/TopNavBar'
-import { Box, CssBaseline, Typography, Container, TextField, Button, Popover, IconButton } from '@mui/material'
-import { useNavigate } from 'react-router-dom'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
-import { useParams } from 'react-router-dom'
-
-const textFieldStyle = {
-  '& .MuiInputBase-input': {
-    color: 'white',
-  },
-  '& label': {
-    color: 'white',
-  },
-  '& .MuiInputLabel-root.Mui-focused': {
-    color: 'orange',
-  },
-  '& .MuiOutlinedInput-root': {
-    '& fieldset': {
-      borderColor: 'orange',
-    },
-    '&:hover fieldset': {
-      borderColor: 'orange',
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: 'orange',
-    },
-  },
-}
+import React, { useEffect, useState } from 'react';
+import TopNavBar from '../Components/TopNavBar';
+import { Box, CssBaseline, Typography, Container, Popover, Button, Checkbox, Radio } from '@mui/material';
+import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 export default function ProjectDetailsMember() {
-  const [anchorEl, setAnchorEl] = React.useState(null)
-  const navigate = useNavigate()
+  const [anchorEl, setAnchorEl] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { project, email } = location.state || {};
+
+  const member = project?.members.find(member => member.name === email);
+  const [tasks, setTasks] = useState(member?.tasks || []);
 
   const handleOpenPopover = (event) => {
-    setAnchorEl(event.currentTarget)
-  }
+    setAnchorEl(event.currentTarget);
+  };
 
   const handleClosePopover = () => {
-    setAnchorEl(null)
-  }
+    setAnchorEl(null);
+  };
 
   const toLogOut = () => {
-    navigate('/')
-  }
+    navigate('/');
+  };
 
-  const { email } = useParams()
+  const handleCheckboxChange = (index) => {
+    setTasks((prevTasks) => {
+      const newTasks = [...prevTasks];
+      newTasks[index].status = !newTasks[index].status;
+      return newTasks;
+    });
+  };
+
+  const updateTask = async () => {
+    await axios.put(`http://localhost:8000/api/v2/auth/editProject/${project.id}/`, project, {
+      headers: {
+        'Content-Type': 'application/JSON',
+        'Referrer-Policy': 'same-origin',
+        'Cross-Origin-Opener-Policy': 'same-origin',
+      },
+    }).then(response => {
+      console.log(response);
+    }).catch(error => {
+      alert(error);
+    });
+  };
+  const [allComment, setAllComment] = useState([]);
   
+  const getComment = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/v2/auth/comments/project/${project.id}/receiver/${member.name}/`, {
+        headers:{
+          'Content-Type': 'application/JSON',
+          'Referrer-Policy': 'same-origin',
+          'Cross-Origin-Opener-Policy': 'same-origin',
+        }
+      });
+      setAllComment(response.data); // Assuming response.data is an array of comments
+    } catch (error) {
+      alert(error);
+    }
+  };
 
+  useEffect(()=>{
+    getComment()
+  }, [])
+  
   return (
     <>
       <CssBaseline />
       <TopNavBar handleOpenPopover={handleOpenPopover} toLogOut={toLogOut} />
-      
+
       <Box
         component="main"
         sx={{
@@ -84,33 +103,78 @@ export default function ProjectDetailsMember() {
           </Popover>
         )}
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center', alignContent: 'center' }}>
-            <Box
-                sx={{
-                backgroundColor: 'rgba(0, 0, 0, .5)',
-                height: '70vh',
-                width: '80vw',
-                display: 'flex',
-                flexDirection: 'row',
-                padding:2,
-                boxShadow: '0px 0px 10px rgba(0, 0, 0, 1)',
-                }}
-            >
-                <Box sx={{display:'flex', flexDirection:'column', flex:1}}>
-                    <Typography sx={{color:'white', fontSize:30}}>Project Name</Typography>
+          <Box
+            sx={{
+              backgroundColor: 'rgba(0, 0, 0, .5)',
+              height: '70vh',
+              width: '80vw',
+              display: 'flex',
+              flexDirection: 'column',
+              padding: 2,
+              boxShadow: '0px 0px 10px rgba(0, 0, 0, 1)',
+            }}
+          >
+            <Typography sx={{ color: 'white', fontSize: 30 }}>{project.projectName}</Typography>
+            <Typography sx={{ color: 'white', mb: 2 }}>Created by: {project.creator}</Typography>
 
-                    <Box sx={{display:'flex', }}>
-                        <Box sx={{flex:1, p:1, m:1, border: '2px solid orange'}}>
-                            <Typography sx={{color:'white'}}>Project Members</Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'row', flex: 1, maxHeight:'85%'}}>
+              <Box sx={{ flex: 1, p: 1, m: 1, border: '2px solid orange', overflow: 'auto', maxHeight: '90%' }}>
+                <Typography sx={{ color: 'white', marginBottom: 2 }}>To do:</Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {tasks.length > 0 ? (
+                    tasks.map((task, index) => (
+                      <Box key={index} sx={{ display: 'flex', flexDirection: 'column', mb: 2, p: 2, border: '1px solid white', borderRadius: 1 }}>
+                        <Typography sx={{ color: 'white', mb: 1 }}>Task Name: {task.taskname}</Typography>
+                        <Typography sx={{ color: 'white', mb: 1 }}>Description: {task.taskDescription}</Typography>
+                        <Typography sx={{ color: 'white', mb: 1 }}>Start Date: {task.startdate}</Typography>
+                        <Typography sx={{ color: 'white', mb: 1 }}>End Date: {task.endDate}</Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: task.status ? 'green' : 'red', padding: '4px', borderRadius: '4px' }}>
+                          <Checkbox
+                            sx={{ color: 'white' }}
+                            checked={task.status}
+                            onChange={() => handleCheckboxChange(index)}
+                          />
+                          <Typography sx={{ color: 'white' }}>{task.status ? 'Completed' : 'Pending'}</Typography>
                         </Box>
-                        <Box sx={{flex:1, p:1, m:1, border: '2px solid orange'}}>
-                            <Typography sx={{color:'white'}}>My to do:</Typography>
-                        </Box>
-                    </Box>
+                      </Box>
+                    ))
+                  ) : (
+                    <Typography sx={{ color: 'white' }}>No tasks available</Typography>
+                  )}
                 </Box>
-
-            </Box>
+              </Box>
+              <Box sx={{ flex: 1, p: 1, m: 1, border: '2px solid orange', overflow: 'auto', maxHeight: '90asa%' }}>
+                <Typography sx={{ color: 'white', marginBottom: 2 }}>Comments</Typography>
+                <Box sx={{ flex: 1, p: 1, m: 1, border: '2px solid orange', overflow: 'auto', maxHeight: '90%' }}>
+                  <Typography sx={{ color: 'white', marginBottom: 2 }}>Comments</Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {allComment.map((comment, index) => (
+                      <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Typography sx={{ color: 'white' }}>{comment.leader}:&nbsp;&nbsp;{comment.content}</Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
+              </Box>
+              
+            
+          </Box>
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: 'orange',
+                color: 'black',
+                alignSelf: 'center',
+                mt: 2,
+                width: '150px',
+              }}
+              onClick={updateTask}
+            >
+              Update Progress
+            </Button>
+          </Box>
         </Container>
       </Box>
     </>
-  )
+  );
 }

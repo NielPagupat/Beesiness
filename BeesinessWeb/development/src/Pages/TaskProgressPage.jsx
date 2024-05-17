@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TopNavBar from '../Components/TopNavBar';
-import { Box, CssBaseline, Typography, Container, TextField, Button, Popover, IconButton } from '@mui/material';
+import { Box, CssBaseline, Typography, Container, TextField, Button, Popover } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 
 const textFieldStyle = {
@@ -31,10 +29,12 @@ const textFieldStyle = {
 
 export default function TaskProgress() {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [comment, setComment] = useState('');
+ 
+  const [allComment, setAllComment] = useState([]);
+  
   const navigate = useNavigate();
   const location = useLocation();
-  const { member, projectName, projectID } = location.state;
+  const { member, projectName, projectID, creator } = location.state;
 
   const handleOpenPopover = (event) => {
     setAnchorEl(event.currentTarget);
@@ -48,44 +48,54 @@ export default function TaskProgress() {
     navigate('/');
   };
 
+  const [comment, setComment] = useState({
+    "leader": creator,
+    "reciever": member.name,
+    "project": projectID,
+    "content": ''
+  });
+
+  const onChangeCommentContent = (key, value) =>{
+    setComment(prevState => ({
+      ...prevState,
+      [key]: value
+    }));
+  };
+
+  const getComment = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/v2/auth/comments/project/${projectID}/receiver/${member.name}/`, {
+        headers:{
+          'Content-Type': 'application/JSON',
+          'Referrer-Policy': 'same-origin',
+          'Cross-Origin-Opener-Policy': 'same-origin',
+        }
+      });
+      setAllComment(response.data); // Assuming response.data is an array of comments
+    } catch (error) {
+      alert(error);
+    }
+  };
+
   const saveComment = async () => {
-    // if (!member) {
-    //   console.error('Member is undefined.');
-    //   return;
-    // }
-  
-    // try {
-    //   const projectId = projectID; // Replace with your project ID
-    //   const taskId = member.id; // Get the task ID from member object
-    //   const updatedMember = {
-    //     ...member,
-    //     tasks: member.tasks ? member.tasks.map(task => ({
-    //       ...task,
-    //       comment: [...(task.comment || []), comment], // Append the new comment to existing comments or initialize an empty array if comments are undefined
-    //     })) : [],
-    //   };
-    //   const updatedProject = {
-    //     ...location.state,
-    //     members: location.state.members.map(mem => (mem.id === member.id ? updatedMember : mem)),
-    //   };
-  
-    //   const response = await axios.put(`http://localhost:8000/api/v2/auth/editProject/${projectId}/`, updatedProject, {
-    //     headers: {
-    //       'Content-Type': 'application/JSON',
-    //       'Referrer-Policy': 'same-origin',
-    //       'Cross-Origin-Opener-Policy': 'same-origin',
-    //     }
-    //   });
-      
-    //   console.log(response.data);
-    //   // Optionally, update the state or perform any other action upon successful comment submission
-    // } catch (error) {
-    //   console.error('Error saving comment:', error);
-    //   // Handle error as needed
-    // }
-    console.log(member.id, projectID, projectName)
+    
+    try {
+      await axios.post('http://localhost:8000/api/v2/auth/api/projects/add-comment/', comment, {
+        headers:{
+          'Content-Type': 'application/JSON',
+          'Referrer-Policy': 'same-origin',
+          'Cross-Origin-Opener-Policy': 'same-origin',
+        }
+      });
+      getComment()
+    } catch (error) {
+      alert(error);
+    }
   };
   
+  useEffect(() => {
+    getComment();
+  }, []);
 
   return (
     <>
@@ -146,7 +156,17 @@ export default function TaskProgress() {
                         <Typography>Description: {task.taskDescription}</Typography>
                         <Typography>Start Date: {task.startdate}</Typography>
                         <Typography>End Date: {task.endDate}</Typography>
-                        <Typography>Status: {task.status ? 'Completed' : 'In Progress'}</Typography>
+                        <Typography
+                          sx={{
+                            backgroundColor: task.status ? 'green' : 'red',
+                            color: 'white',
+                            padding: '2px 4px',
+                            borderRadius: '4px',
+                            display: 'inline-block',
+                          }}
+                        >
+                          Status: {task.status ? 'Completed' : 'In Progress'}
+                        </Typography>
                       </Box>
                     </Box>
                   ))
@@ -156,29 +176,26 @@ export default function TaskProgress() {
               </Box>
               <Box sx={{ flex: 1, p: 1, m: 1, border: '2px solid orange', position: 'relative' }}>
                 <Typography sx={{ color: 'white' }}>Comments:</Typography>
+                {allComment.length > 0 ? (
+                  allComment.map((comment, index) => (
+                    <Box key={index} sx={{ color: 'white', mt: 1 , p:1, border: '2px solid orange'}}>
+                      <Typography>{comment.leader} commented: {comment.content}</Typography>
+                    </Box>
+                  ))
+                ) : (
+                  <Typography sx={{ color: 'white', mt: 1 }}>No comments yet</Typography>
+                )}
                 <TextField
                   label="Add Comment"
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
+                  value={comment.content}
+                  onChange={(e) => onChangeCommentContent("content", e.target.value)}
                   fullWidth
                   sx={{ ...textFieldStyle, mt: 1 }}
                 />
+                
                 <Button onClick={saveComment} variant="contained" sx={{ mt: 1 }}>Save Comment</Button>
                 {/* Display comments */}
-                {member.tasks.length > 0 && member.tasks.some(task => task.comment.length > 0) && (
-                  <Box sx={{ mt: 2, maxHeight: '50%', overflowY: 'auto' }}>
-                    {member.tasks.map((task, index) => (
-                      task.comment.length > 0 && (
-                        <Box key={index} sx={{ color: 'white', mt: 1 }}>
-                          <Typography>Task {index + 1} Comments:</Typography>
-                          {task.comment.map((cmt, idx) => (
-                            <Typography key={idx}>- {cmt}</Typography>
-                          ))}
-                        </Box>
-                      )
-                    ))}
-                  </Box>
-                )}
+                
               </Box>
             </Box>
           </Box>
@@ -187,3 +204,5 @@ export default function TaskProgress() {
     </>
   );
 }
+
+
