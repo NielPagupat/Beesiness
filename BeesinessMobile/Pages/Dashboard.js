@@ -14,29 +14,29 @@ export default function Dashboard() {
   const [userEmail, setUserEmail] = useState();
   const [allUsers, setAllUsers] = useState([])
 
-  // const getUserAccountsList = async() => {
-  //   const result = await axios.get('http://192.168.1.10:8000/api/v2/auth/getAllUsers/',
-  // {headers:{
-  //   'Content-Type':'application/JSON',
-  //   'Referrer-Policy':'same-origin',
-  //   'Cross-Origin-Opener-Policy':'same-origin'
-  // }}).then(response=>{
-  //   if (response.data.length > 0) {
-  //     const user = response.data[0];
-  //     setUserEmail(user.email);
-  //   }
-  //   setAllUsers(response.data)
-  // }).catch(error=>{
-  //   console.log(error)
-  // })
-  // }
+  const getUserAccountsList = async() => {
+    const result = await axios.get('http://192.168.1.10:8000/api/v2/auth/getAllUsers/',
+  {headers:{
+    'Content-Type':'application/JSON',
+    'Referrer-Policy':'same-origin',
+    'Cross-Origin-Opener-Policy':'same-origin'
+  }}).then(response=>{
+    if (response.data.length > 0) {
+      const user = response.data[0];
+      setUserEmail(user.email);
+    }
+    setAllUsers(response.data)
+  }).catch(error=>{
+    console.log(error)
+  })
+  }
 
-  // useEffect(()=>{
-  //   getUserAccountsList
-  //    const intervalId = setInterval(getUserAccountsList, 3000);
+  useEffect(()=>{
+    getUserAccountsList
+     const intervalId = setInterval(getUserAccountsList, 3000);
 
-  //    return () => clearInterval(intervalId);
-  // }, [])
+     return () => clearInterval(intervalId);
+  }, [])
 
   const toLogOut = () => {
     navigation.navigate('Login');
