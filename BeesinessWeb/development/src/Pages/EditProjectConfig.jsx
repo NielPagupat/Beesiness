@@ -143,7 +143,7 @@ export default function EditProject() {
 
   const viewMemberProgress = (index) => {
     const memberData = projectState.members[index];
-    navigate('/TaskProgress', { state: { member: memberData, projectName: projectState.projectName, projectID:project.id } });
+    navigate('/TaskProgress', { state: { member: memberData, projectName: projectState.projectName, projectID:project.id, creator:projectState.creator } });
   };
 
   return (
@@ -269,7 +269,7 @@ export default function EditProject() {
                 }}
               >
                 {selectedMemberIndex !== null && projectState.members[selectedMemberIndex].tasks.length > 0 ? (
-                  projectState.members[selectedMemberIndex].tasks                    .map((task, index) => (
+                  projectState.members[selectedMemberIndex].tasks.map((task, index) => (
                     <Box key={index} sx={{ marginBottom: '10px', color: 'white', display: 'flex', alignItems: 'center' }}>
                       <Typography>Task {index + 1}: {task.taskname}</Typography>
                       <IconButton onClick={() => handleRemoveTask(index)}>
