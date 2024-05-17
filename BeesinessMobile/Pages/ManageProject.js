@@ -1,15 +1,17 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, StyleSheet, Text, ImageBackground, StatusBar, TouchableOpacity } from 'react-native';
-import { Avatar, Icon, IconButton } from 'react-native-paper'; 
+import { IconButton } from 'react-native-paper'; 
 import TopNavigation from '../NavigationBars/TopNavigation';
-import { useNavigation } from '@react-navigation/native';
-
+import { useNavigation, useRoute} from '@react-navigation/native';
+import axios from 'axios';
 
 export default function ManageProject() {
     const navigation = useNavigation()
+    const route = useRoute()
 
-    const [userEmail, setUserEmail] = useState();
-    const [allUsers, setAllUsers] = useState([])
+    const [userEmail, setUserEmail] = useState(route.params?.userEmail || '');
+    const [myProjects, setMyProjects] = React.useState([]);
+    const [myCollaborations, setMyCollaborations] = React.useState([]);
 
     const toLogOut = () => {
         navigation.navigate('Login');
@@ -19,13 +21,45 @@ export default function ManageProject() {
         navigation.navigate('Dashboard');
       }
 
-    const toProjecttemp = () => {
-        navigation.navigate('ProjectAsLeader')
-    }
+    const getMyProjects = async () => {
+        try {
+          const response = await axios.get(`http://192.168.1.11:8000/api/v2/auth/projects/creator/${userEmail}`, {
+            headers: {
+              'Content-Type': 'application/JSON',
+              'Referrer-Policy': 'same-origin',
+              'Cross-Origin-Opener-Policy': 'same-origin',
+            },
+          });
+          setMyProjects(response.data);
+        } catch (error) {
+          alert(error);
+        }
+      };
 
-    const toProjectmemtemp = () => {
-        navigation.navigate('ProjectAsMember')
-    }
+    const getMyCollaborations = async () => {
+        try {
+        const response = await axios.get(`http://192.168.1.11:8000/api/v2/auth/projects/member/${userEmail}`, {
+            headers: {
+            'Content-Type': 'application/JSON',
+            'Referrer-Policy': 'same-origin',
+            'Cross-Origin-Opener-Policy': 'same-origin',
+            },
+        });
+        setMyCollaborations(response.data);
+        } catch (error) {
+        alert(error);
+        }
+    };    
+
+    useEffect(() => {
+    getMyProjects();
+    getMyCollaborations();
+  }, []);
+  
+  const goToEditProject = (project) => {
+    navigation.navigate('/editProject', { state: { project } });
+  };
+
   return (
     <View style={styles.container}>
         <ImageBackground source={require('../assets/wallpaper.png')} style={{flex: 1, resizeMode: "cover", justifyContent: "center", paddingTop: StatusBar.currentHeight,}}>
@@ -42,29 +76,34 @@ export default function ManageProject() {
                     <View style={{margin:20, marginHorizontal:30}}>
                         <Text style={{color:'#303030', fontSize:20, fontWeight:'bold'}}>Your Projects: </Text>
                         <View style={{margin:5}}>
-                            <TouchableOpacity onPress={toProjecttemp} style={{backgroundColor:'#fff', borderRadius:5, padding:10, marginVertical:5}}>
-                                <Text>project_name</Text>
+                        {myProjects.length > 0 ? (
+                        myProjects.map((project) => (
+                            <TouchableOpacity
+                            key={project.id}
+                            onPress={() => goToEditProject(project)}
+                            style={{ color: 'white', marginBottom: 2, marginLeft: 5 }}
+                            >
+                            <Text>{project.projectName}</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={{backgroundColor:'#fff', borderRadius:5, padding:10, marginVertical:5}}>
-                                <Text>project_name</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={{backgroundColor:'#fff', borderRadius:5, padding:10, marginVertical:5}}>
-                                <Text>project_name</Text>
-                            </TouchableOpacity>
+                        ))
+                        ) : (
+                        <Text style={{ color: 'white' }}>No projects available</Text>
+                        )}
                         </View>
                         
                     </View>
                     <View style={{margin:10, marginHorizontal:30}}>
                         <Text style={{color:'#303030', fontSize:20, fontWeight:'bold'}}>Project Collaborations: </Text>
                         <View style={{margin:5}}>
-                            <TouchableOpacity onPress={toProjectmemtemp} style={{backgroundColor:'#fff', borderRadius:5, padding:10, marginVertical:5, flexDirection:'row', justifyContent:'space-between'}}>
-                                <Text>project_name</Text>
-                                <Text>w/ Niel, 5+ users</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={{backgroundColor:'#fff', borderRadius:5, padding:10, marginVertical:5, flexDirection:'row', justifyContent:'space-between'}}>
-                                <Text>project_name</Text>
-                                <Text>w/ Lance, +2 users</Text>
-                            </TouchableOpacity>
+                        {myCollaborations.length > 0 ? (
+                        myCollaborations.map((collab) => (
+                            <Text key={collab.id} style={{ color: 'white', marginBottom: 2, marginLeft: 5 }}>
+                            {collab.projectName} ----- {collab.creator}
+                            </Text>
+                        ))
+                        ) : (
+                        <Text sx={{ color: 'white' }}>No collaborations available</Text>
+                        )}
                         </View>   
                     </View>
                 </View>

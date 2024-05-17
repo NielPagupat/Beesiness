@@ -37,14 +37,14 @@ export default function Login() {
     }
     
     const logIn = async() => {
-        const result = axios.post('http://192.168.1.10:8000/api/v2/auth/token/login/', credential, {
+        const result = axios.post('http://192.168.1.11:8000/api/v2/auth/token/login/', credential, {
             headers:{
                 'Content-Type':'application/JSON',
                 'Referrer-Policy':'same-origin',
                 'Cross-Origin-Opener-Policy':'same-origin'
             }
         }).then(response => {
-            navigation.navigate('Dashboard')
+            navigation.navigate('Dashboard', { userEmail: credential.email })
         })
         .catch(error => {
             alert('Invalid Credentials')
