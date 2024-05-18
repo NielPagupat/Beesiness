@@ -14,7 +14,7 @@ export default function Router() {
   return (
     <Routes>
         <Route path='/' element={<Login/>} />
-        <Route path='/dash/:auth_token/' element={<Dashboard/>} />
+        <Route path='/dash/:email/' element={<Dashboard/>} />
         <Route path='/createProject/:email/' element={<AddProject/>}/>
         <Route path='checkProject/:email/' element={<OpenProject />}/>
         <Route path='/projectDetailMember/' element={<ProjectDetailsMember/>}/>

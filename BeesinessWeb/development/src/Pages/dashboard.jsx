@@ -45,7 +45,7 @@ const defaultTheme = createTheme();
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  const {auth_token} = useParams()
+  const {email} = useParams()
   const [allUsers, setAllUsers] = React.useState([])
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
@@ -159,6 +159,7 @@ export default function Dashboard() {
               <Button
                 sx={{ fontSize: '20px', marginRight: '10px', minWidth: 0 }}
                 startIcon={<AddCircleOutline style={{ fontSize: 100, color:'#D28200' }} />} // Increasing icon size to 40px
+
               />
               <Typography sx={{ color: 'white', fontSize: '20px' }}>Add Project</Typography>
             </Box>

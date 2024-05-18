@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import invite
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView, ListAPIView
 from .serializers import createInvite
 # Create your views here.
 
@@ -13,12 +13,16 @@ class CRUDInviteAPIView(RetrieveUpdateDestroyAPIView):
     queryset = invite.objects.all()
     serializer_class = createInvite
 
-class GetInviteAsInvitorAPIView(RetrieveAPIView):
-    lookup_field = 'invitor'
-    queryset = invite.objects.all()
+class GetInviteAsInvitorAPIView(ListAPIView):
     serializer_class = createInvite
 
-class GetInviteAsInviteeAPIView(RetrieveAPIView):
-    lookup_field = 'invitee'
-    queryset = invite.objects.all()
+    def get_queryset(self):
+        invitor_value = self.kwargs.get('invitor')
+        return invite.objects.filter(invitor=invitor_value)
+
+class GetInviteAsInviteeAPIView(ListAPIView):
     serializer_class = createInvite
+
+    def get_queryset(self):
+        invitee_value = self.kwargs.get('invitee')
+        return invite.objects.filter(invitee=invitee_value)

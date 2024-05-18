@@ -62,7 +62,7 @@ export default function SignInSide() {
     'Referrer-Policy':'same-origin',
     'Cross-Origin-Opener-Policy':'same-origin'
   }}).then(response=>{
-    navigate('/dash/'+response.data.auth_token)
+    navigate('/dash/'+credentials.email)
     console.log(response)
   }).catch(error=>{
     alert("invalidCredentials")

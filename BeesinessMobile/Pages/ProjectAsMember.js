@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { FlatList, ScrollView } from 'react-native-gesture-handler';
 
 
-export default function ManageProject() {
+export default function ProjectAsMember() {
     const navigation = useNavigation()
 
     const [userEmail, setUserEmail] = useState();

@@ -55,9 +55,9 @@ export default function ManageProject() {
     getMyProjects();
     getMyCollaborations();
   }, []);
-  
+
   const goToEditProject = (project) => {
-    navigation.navigate('/editProject', { state: { project } });
+    navigation.navigate('ProjectAsLeader', { project, userEmail: userEmail } );
   };
 
   return (
@@ -81,7 +81,7 @@ export default function ManageProject() {
                             <TouchableOpacity
                             key={project.id}
                             onPress={() => goToEditProject(project)}
-                            style={{ color: 'white', marginBottom: 2, marginLeft: 5 }}
+                            style={{backgroundColor:'white', marginVertical:5, padding:10, borderRadius:10}}
                             >
                             <Text>{project.projectName}</Text>
                             </TouchableOpacity>
