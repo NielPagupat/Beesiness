@@ -131,18 +131,19 @@ export default function OpenProject() {
     <>
       <CssBaseline />
       <TopNavBar handleOpenPopover={handleOpenPopover} toLogOut={toLogOut} />
-      
+
       <Box
         component="main"
         sx={{
           background: 'radial-gradient(circle at 35% 70%, #333133, #1E191A)',
           flexGrow: 1,
-          height: '100vh',
+          minHeight: '100vh',
           overflow: 'auto',
           alignContent: 'center',
           backgroundImage: 'url("../src/assets/beehive.png")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          p: { xs: 2, sm: 3, md: 5 },
         }}
       >
         <Box sx={{ position: 'fixed', top: 16, right: 16 }}>
@@ -191,53 +192,65 @@ export default function OpenProject() {
           </Popover>
         )}
 
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center', alignContent: 'center' }}>
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'center', alignContent: 'center' }}>
           <Box
             sx={{
               backgroundColor: 'rgba(0, 0, 0, .5)',
-              height: '70vh',
-              width: '80vw',
+              flex: 1,
               display: 'flex',
-              flexDirection: 'row',
-              padding: 2,
+              flexDirection: 'column',
+              p: 2,
               boxShadow: '0px 0px 10px rgba(0, 0, 0, 1)',
+              mb: { xs: 2, md: 0 },
+              mr: { md: 2 },
+              border: '2px solid orange',
             }}
           >
-            <Box sx={{ flex: 1, border: '2px solid orange', margin: 1, p: 1 }}>
-              <Typography sx={{ color: 'white', marginBottom: 2, fontSize: 30 }}>My Projects</Typography>
-              <Box sx={{ height: 'calc(100% - 32px)', overflowY: 'auto' }}>
-                {myProjects.length > 0 ? (
-                  myProjects.map((project) => (
-                    <Button
-                      key={project.id}
-                      onClick={() => goToEditProject(project)}
-                      sx={{ color: 'white', marginBottom: 2, marginLeft: 5 }}
-                    >
-                      {project.projectName}
-                    </Button>
-                  ))
-                ) : (
-                  <Typography sx={{ color: 'white' }}>No projects available</Typography>
-                )}
-              </Box>
+            <Typography sx={{ color: 'white', marginBottom: 2, fontSize: 30 }}>My Projects</Typography>
+            <Box sx={{ height: 'calc(100% - 32px)', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+              {myProjects.length > 0 ? (
+                myProjects.map((project) => (
+                  <Button
+                    key={project.id}
+                    onClick={() => goToEditProject(project)}
+                    sx={{ color: 'orange', marginBottom: 2, textAlign: 'left' }}
+                    fullWidth
+                  >
+                    {project.projectName}
+                  </Button>
+                ))
+              ) : (
+                <Typography sx={{ color: 'white' }}>No projects available</Typography>
+              )}
             </Box>
-            <Box sx={{ flex: 1, border: '2px solid orange', margin: 1, p: 1 }}>
-              <Typography sx={{ color: 'white', marginBottom: 2, fontSize: 30 }}>My Collaborations</Typography>
-              <Box sx={{ height: 'calc(100% - 32px)', overflowY: 'auto' }}>
-                {myCollaborations.length > 0 ? (
-                  myCollaborations.map((collab) => (
-                    <Button
-                      key={collab.id}
-                      onClick={() => goToProjectDetailAsMember(collab)}
-                      sx={{ color: 'white', marginBottom: 2, marginLeft: 5 }}
-                    >
-                      {collab.projectName} ----- {collab.creator}
-                    </Button>
-                  ))
-                ) : (
-                  <Typography sx={{ color: 'white' }}>No collaborations available</Typography>
-                )}
-              </Box>
+          </Box>
+          <Box
+            sx={{
+              backgroundColor: 'rgba(0, 0, 0, .5)',
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              p: 2,
+              boxShadow: '0px 0px 10px rgba(0, 0, 0, 1)',
+              border: '2px solid orange',
+            }}
+          >
+            <Typography sx={{ color: 'white', marginBottom: 2, fontSize: 30 }}>My Collaborations</Typography>
+            <Box sx={{ height: 'calc(100% - 32px)', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+              {myCollaborations.length > 0 ? (
+                myCollaborations.map((collab) => (
+                  <Button
+                    key={collab.id}
+                    onClick={() => goToProjectDetailAsMember(collab)}
+                    sx={{ color: 'orange', marginBottom: 2, textAlign: 'left' }}
+                    fullWidth
+                  >
+                    {collab.projectName} ----- {collab.creator}
+                  </Button>
+                ))
+              ) : (
+                <Typography sx={{ color: 'white' }}>No collaborations available</Typography>
+              )}
             </Box>
           </Box>
         </Container>

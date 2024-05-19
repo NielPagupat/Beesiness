@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import TopNavBar from '../Components/TopNavBar';
-import { Box, CssBaseline, Typography, Container, Popover, Button, Checkbox, Radio } from '@mui/material';
+import { Box, CssBaseline, Typography, Container, Popover, Button, Checkbox, Grid } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
@@ -46,12 +46,13 @@ export default function ProjectDetailsMember() {
       alert(error);
     });
   };
+
   const [allComment, setAllComment] = useState([]);
-  
+
   const getComment = async () => {
     try {
       const response = await axios.get(`http://localhost:8000/api/v2/auth/comments/project/${project.id}/receiver/${member.name}/`, {
-        headers:{
+        headers: {
           'Content-Type': 'application/JSON',
           'Referrer-Policy': 'same-origin',
           'Cross-Origin-Opener-Policy': 'same-origin',
@@ -63,10 +64,18 @@ export default function ProjectDetailsMember() {
     }
   };
 
-  useEffect(()=>{
-    getComment()
-  }, [])
-  
+  useEffect(() => {
+    getComment();
+  }, []);
+
+  const buttonStyle = {
+    backgroundColor: 'orange',
+    color: 'black',
+    '&:hover': {
+      backgroundColor: 'darkorange',
+    },
+  };
+
   return (
     <>
       <CssBaseline />
@@ -117,35 +126,36 @@ export default function ProjectDetailsMember() {
             <Typography sx={{ color: 'white', fontSize: 30 }}>{project.projectName}</Typography>
             <Typography sx={{ color: 'white', mb: 2 }}>Created by: {project.creator}</Typography>
 
-            <Box sx={{ display: 'flex', flexDirection: 'row', flex: 1, maxHeight:'85%'}}>
-              <Box sx={{ flex: 1, p: 1, m: 1, border: '2px solid orange', overflow: 'auto', maxHeight: '90%' }}>
-                <Typography sx={{ color: 'white', marginBottom: 2 }}>To do:</Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  {tasks.length > 0 ? (
-                    tasks.map((task, index) => (
-                      <Box key={index} sx={{ display: 'flex', flexDirection: 'column', mb: 2, p: 2, border: '1px solid white', borderRadius: 1 }}>
-                        <Typography sx={{ color: 'white', mb: 1 }}>Task Name: {task.taskname}</Typography>
-                        <Typography sx={{ color: 'white', mb: 1 }}>Description: {task.taskDescription}</Typography>
-                        <Typography sx={{ color: 'white', mb: 1 }}>Start Date: {task.startdate}</Typography>
-                        <Typography sx={{ color: 'white', mb: 1 }}>End Date: {task.endDate}</Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: task.status ? 'green' : 'red', padding: '4px', borderRadius: '4px' }}>
-                          <Checkbox
-                            sx={{ color: 'white' }}
-                            checked={task.status}
-                            onChange={() => handleCheckboxChange(index)}
-                          />
-                          <Typography sx={{ color: 'white' }}>{task.status ? 'Completed' : 'Pending'}</Typography>
+            <Grid container spacing={2} sx={{ flex: 1, maxHeight: '85%' }}>
+              <Grid item xs={12} md={6}>
+                <Box sx={{ p: 1, border: '2px solid orange', overflow: 'auto', maxHeight: '90%' }}>
+                  <Typography sx={{ color: 'white', marginBottom: 2 }}>To do:</Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {tasks.length > 0 ? (
+                      tasks.map((task, index) => (
+                        <Box key={index} sx={{ display: 'flex', flexDirection: 'column', mb: 2, p: 2, border: '1px solid white', borderRadius: 1 }}>
+                          <Typography sx={{ color: 'white', mb: 1 }}>Task Name: {task.taskname}</Typography>
+                          <Typography sx={{ color: 'white', mb: 1 }}>Description: {task.taskDescription}</Typography>
+                          <Typography sx={{ color: 'white', mb: 1 }}>Start Date: {task.startdate}</Typography>
+                          <Typography sx={{ color: 'white', mb: 1 }}>End Date: {task.endDate}</Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: task.status ? 'green' : 'red', padding: '4px', borderRadius: '4px' }}>
+                            <Checkbox
+                              sx={{ color: 'white' }}
+                              checked={task.status}
+                              onChange={() => handleCheckboxChange(index)}
+                            />
+                            <Typography sx={{ color: 'white' }}>{task.status ? 'Completed' : 'Pending'}</Typography>
+                          </Box>
                         </Box>
-                      </Box>
-                    ))
-                  ) : (
-                    <Typography sx={{ color: 'white' }}>No tasks available</Typography>
-                  )}
+                      ))
+                    ) : (
+                      <Typography sx={{ color: 'white' }}>No tasks available</Typography>
+                    )}
+                  </Box>
                 </Box>
-              </Box>
-              <Box sx={{ flex: 1, p: 1, m: 1, border: '2px solid orange', overflow: 'auto', maxHeight: '90asa%' }}>
-                <Typography sx={{ color: 'white', marginBottom: 2 }}>Comments</Typography>
-                <Box sx={{ flex: 1, p: 1, m: 1, border: '2px solid orange', overflow: 'auto', maxHeight: '90%' }}>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Box sx={{ p: 1, border: '2px solid orange', overflow: 'auto', maxHeight: '90%' }}>
                   <Typography sx={{ color: 'white', marginBottom: 2 }}>Comments</Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {allComment.map((comment, index) => (
@@ -155,15 +165,12 @@ export default function ProjectDetailsMember() {
                     ))}
                   </Box>
                 </Box>
-              </Box>
-              
-            
-          </Box>
+              </Grid>
+            </Grid>
             <Button
               variant="contained"
               sx={{
-                backgroundColor: 'orange',
-                color: 'black',
+                ...buttonStyle,
                 alignSelf: 'center',
                 mt: 2,
                 width: '150px',
