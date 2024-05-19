@@ -122,6 +122,19 @@ export default function AddProject() {
       setMembers(updatedMembers)
     }
   }
+  const sendInvitation = async () => {
+    members.forEach(async (member) => {
+      await axios.post('http://localhost:8000/api/v2/auth/createInvite/', {
+        invitor: email,
+        invitee: member.name,
+        projectname: project.projectName,
+      }, {headers:{
+        'Content-Type':'application/JSON',
+        'Referrer-Policy':'same-origin',
+        'Cross-Origin-Opener-Policy':'same-origin'
+      }});
+    });
+  };
 
   const saveProjectData = async () => {
     await axios.post('http://localhost:8000/api/v2/auth/createProject/', project, 
@@ -130,11 +143,13 @@ export default function AddProject() {
       'Referrer-Policy':'same-origin',
       'Cross-Origin-Opener-Policy':'same-origin'
     }}).then(response=>{
+      sendInvitation()
       console.log(response)
   }).catch(error=>{
     alert(error)
   })
 }
+
 
   return (
     <>

@@ -98,6 +98,14 @@ export default function Dashboard() {
   //    // Clean up function to clear the interval
   //    return () => clearInterval(intervalId);
   // }, [])
+
+  const goToCreateProject = () => {
+    navigate('/createProject/'+email)
+  }
+
+  const goToCheckProject = () => {
+    navigate('/checkProject/'+email)
+  }
   return (
     
     <Box sx={{ display: 'flex', width: '100vw', height: '100vh' }}>
@@ -159,7 +167,7 @@ export default function Dashboard() {
               <Button
                 sx={{ fontSize: '20px', marginRight: '10px', minWidth: 0 }}
                 startIcon={<AddCircleOutline style={{ fontSize: 100, color:'#D28200' }} />} // Increasing icon size to 40px
-
+                onClick={goToCreateProject}
               />
               <Typography sx={{ color: 'white', fontSize: '20px' }}>Add Project</Typography>
             </Box>
@@ -173,6 +181,7 @@ export default function Dashboard() {
               <Button
                 sx={{ fontSize: '20px', marginRight: '10px', minWidth: 0 }}
                 startIcon={<Assignment style={{ fontSize: 100, color:'#D28200'}} />} // Increasing icon size to 40px
+                onClick={goToCheckProject}
               />
               <Typography sx={{ color: 'white', fontSize: '20px' }}>Access Project</Typography>
             </Box>

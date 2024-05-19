@@ -1,15 +1,18 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import TopNavBar from '../Components/TopNavBar';
-import { Box, CssBaseline, Typography, Container, Popover, Button } from '@mui/material';
+import { Box, CssBaseline, Typography, Container, Popover, Button, FormControlLabel, Checkbox, Badge, IconButton } from '@mui/material';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 export default function OpenProject() {
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
   const { email } = useParams();
-  const [myProjects, setMyProjects] = React.useState([]);
-  const [myCollaborations, setMyCollaborations] = React.useState([]);
+  const [myProjects, setMyProjects] = useState([]);
+  const [myCollaborations, setMyCollaborations] = useState([]);
+  const [invitations, setInvitations] = useState([]);
+  const [pendingInvitationsCount, setPendingInvitationsCount] = useState(0);
 
   const handleOpenPopover = (event) => {
     setAnchorEl(event.currentTarget);
@@ -53,9 +56,28 @@ export default function OpenProject() {
     }
   };
 
+  const getInvitations = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/v2/auth/getAsInvitee/${email}`, {
+        headers: {
+          'Content-Type': 'application/JSON',
+          'Referrer-Policy': 'same-origin',
+          'Cross-Origin-Opener-Policy': 'same-origin',
+        },
+      });
+      const invitationsData = response.data;
+      setInvitations(invitationsData);
+      const pendingCount = invitationsData.filter(invitation => !invitation.status).length;
+      setPendingInvitationsCount(pendingCount);
+    } catch (error) {
+      alert(error);
+    }
+  };
+
   useEffect(() => {
     getMyProjects();
     getMyCollaborations();
+    getInvitations();
   }, []);
 
   const goToEditProject = (project) => {
@@ -63,7 +85,46 @@ export default function OpenProject() {
   };
 
   const goToProjectDetailAsMember = (project) => {
-    navigate('/projectDetailMember', { state: { project, email } });
+    const matchingInvitation = invitations.find(invitation => invitation.projectname === project.projectName && invitation.status);
+    if (matchingInvitation) {
+      navigate('/projectDetailMember', { state: { project, email } });
+    } else {
+      alert('You do not have an accepted invitation to access this project.');
+    }
+  };
+
+  const handleAcceptInvitation = async (invitation) => {
+    try {
+      await axios.put(`http://localhost:8000/api/v2/auth/editInvitation/${invitation.id}/`, {
+        invitor: invitation.invitor,
+        invitee: invitation.invitee,
+        status: true,
+      }, {
+        headers: {
+          'Content-Type': 'application/JSON',
+          'Referrer-Policy': 'same-origin',
+          'Cross-Origin-Opener-Policy': 'same-origin',
+        },
+      });
+      getInvitations();
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  const handleDeclineInvitation = async (invitationId) => {
+    try {
+      await axios.delete(`http://localhost:8000/api/v2/auth/editInvitation/${invitationId}`, {
+        headers: {
+          'Content-Type': 'application/JSON',
+          'Referrer-Policy': 'same-origin',
+          'Cross-Origin-Opener-Policy': 'same-origin',
+        },
+      });
+      getInvitations();
+    } catch (error) {
+      alert(error);
+    }
   };
 
   return (
@@ -84,6 +145,14 @@ export default function OpenProject() {
           backgroundPosition: 'center',
         }}
       >
+        <Box sx={{ position: 'fixed', top: 16, right: 16 }}>
+          <IconButton color="inherit" onClick={handleOpenPopover}>
+            <Badge badgeContent={pendingInvitationsCount} color="error">
+              <NotificationsIcon />
+            </Badge>
+          </IconButton>
+        </Box>
+
         {anchorEl && (
           <Popover
             open={!!anchorEl}
@@ -98,9 +167,30 @@ export default function OpenProject() {
               horizontal: 'right',
             }}
           >
-            <Typography sx={{ p: 2 }}>Notifications content</Typography>
+            <Box sx={{ p: 2 }}>
+              {pendingInvitationsCount > 0 ? (
+                invitations.filter(invitation => !invitation.status).map((invitation) => (
+                  <Box key={invitation.id} sx={{ mb: 2 }}>
+                    <Typography>
+                      {invitation.invitor} invites you to join project {invitation.projectname}
+                    </Typography>
+                    <FormControlLabel
+                      control={<Checkbox onChange={() => handleAcceptInvitation(invitation)} />}
+                      label="Accept"
+                    />
+                    <FormControlLabel
+                      control={<Checkbox onChange={() => handleDeclineInvitation(invitation.id)} />}
+                      label="Decline"
+                    />
+                  </Box>
+                ))
+              ) : (
+                <Typography>No pending invitations</Typography>
+              )}
+            </Box>
           </Popover>
         )}
+
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center', alignContent: 'center' }}>
           <Box
             sx={{

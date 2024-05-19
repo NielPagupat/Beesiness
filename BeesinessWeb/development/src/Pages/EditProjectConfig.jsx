@@ -1,9 +1,10 @@
 import React from 'react';
 import TopNavBar from '../Components/TopNavBar';
 import { Box, CssBaseline, Typography, Container, TextField, Button, Popover, IconButton } from '@mui/material';
-import { useNavigate, useLocation } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EmailIcon from '@mui/icons-material/Email'; // Import the email icon
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 const textFieldStyle = {
@@ -54,7 +55,7 @@ export default function EditProject() {
   });
 
   const handleProjectUpdate = (key, value) => {
-    setProjectState(prevState => ({
+    setProjectState((prevState) => ({
       ...prevState,
       [key]: value,
     }));
@@ -71,16 +72,18 @@ export default function EditProject() {
     status: false,
   });
 
-  const addMember = () => {
-    setProjectState(prevState => ({
+  const addMember = async () => {
+    const newMember = { name: member, tasks: [], comment: [] };
+    setProjectState((prevState) => ({
       ...prevState,
-      members: [...prevState.members, { name: member, tasks: [], comment:[], }],
+      members: [...prevState.members, newMember],
     }));
+    await sendInvitation(newMember.name);
     setMember('');
   };
 
   const handleRemoveMember = (index) => {
-    setProjectState(prevState => {
+    setProjectState((prevState) => {
       const updatedMembers = [...prevState.members];
       updatedMembers.splice(index, 1);
       return { ...prevState, members: updatedMembers };
@@ -94,7 +97,7 @@ export default function EditProject() {
 
   const addTaskToMember = () => {
     if (selectedMemberIndex !== null) {
-      setProjectState(prevState => {
+      setProjectState((prevState) => {
         const updatedMembers = [...prevState.members];
         updatedMembers[selectedMemberIndex].tasks.push(task);
         return { ...prevState, members: updatedMembers };
@@ -111,7 +114,7 @@ export default function EditProject() {
 
   const handleRemoveTask = (taskIndex) => {
     if (selectedMemberIndex !== null) {
-      setProjectState(prevState => {
+      setProjectState((prevState) => {
         const updatedMembers = [...prevState.members];
         updatedMembers[selectedMemberIndex].tasks.splice(taskIndex, 1);
         return { ...prevState, members: updatedMembers };
@@ -126,16 +129,35 @@ export default function EditProject() {
         'Referrer-Policy': 'same-origin',
         'Cross-Origin-Opener-Policy': 'same-origin',
       },
-    }).then(response => {
+    }).then((response) => {
       console.log(response);
-    }).catch(error => {
+    }).catch((error) => {
       alert(error);
     });
     console.log(projectState);
   };
 
+  const sendInvitation = async (invitee) => {
+    await axios.post('http://localhost:8000/api/v2/auth/createInvite/', {
+      invitor: project.creator,
+      invitee: invitee,
+      projectname: projectState.projectName,
+    }, {
+      headers: {
+        'Content-Type': 'application/JSON',
+        'Referrer-Policy': 'same-origin',
+        'Cross-Origin-Opener-Policy': 'same-origin',
+      },
+    });
+  };
+
+  const resendInvitation = async (invitee) => {
+    await sendInvitation(invitee);
+    alert(`Invitation resent to ${invitee}`);
+  };
+
   const handleTaskUpdate = (key, value) => {
-    setTask(prevState => ({
+    setTask((prevState) => ({
       ...prevState,
       [key]: value,
     }));
@@ -143,7 +165,7 @@ export default function EditProject() {
 
   const viewMemberProgress = (index) => {
     const memberData = projectState.members[index];
-    navigate('/TaskProgress', { state: { member: memberData, projectName: projectState.projectName, projectID:project.id, creator:projectState.creator } });
+    navigate('/TaskProgress', { state: { member: memberData, projectName: projectState.projectName, projectID: project.id, creator: projectState.creator } });
   };
 
   return (
@@ -231,6 +253,9 @@ export default function EditProject() {
                       <IconButton onClick={() => handleRemoveMember(index)}>
                         <DeleteIcon style={{ color: 'red' }} />
                       </IconButton>
+                      <IconButton onClick={() => resendInvitation(member.name)}>
+                        <EmailIcon style={{ color: 'orange' }} />
+                      </IconButton>
                       <Button onClick={() => viewMemberProgress(index)}>See Member Progress</Button>
                     </Box>
                   ))}
@@ -277,46 +302,45 @@ export default function EditProject() {
                       </IconButton>
                     </Box>
                   ))
-              ) : (
-                <Typography color="white">No tasks yet</Typography>
-              )}
-            </Box>
-            <Box flexDirection={'row'}>
-              <TextField 
-                label="TaskName" 
-                value={task.taskname} 
-                onChange={(e) => handleTaskUpdate('taskname', e.target.value)} 
-                sx={{ ...textFieldStyle, m: 1 }} 
-              />
-              <TextField 
-                label="Task Description" 
-                multiline={true} 
-                maxRows={1} 
-                value={task.taskDescription} 
-                onChange={(e) => handleTaskUpdate('taskDescription', e.target.value)} 
-                sx={{ ...textFieldStyle, m: 1 }} 
-              />
-              <TextField 
-                type="date"
-                helperText="Start Date" 
-                value={task.startdate} 
-                onChange={(e) => handleTaskUpdate('startdate', e.target.value)} 
-                sx={{ ...textFieldStyle, m: 1, color: 'white', '& .MuiFormHelperText-root': { color: 'white' } }} 
-              />
-              <TextField 
-                type="date" 
-                helperText="End Date" 
-                value={task.endDate} 
-                onChange={(e) => handleTaskUpdate('endDate', e.target.value)} 
-                sx={{ ...textFieldStyle, m: 1, color: 'white', '& .MuiFormHelperText-root': { color: 'white' } }} 
-              />
-              <Button onClick={addTaskToMember}>Add Task</Button>
+                ) : (
+                  <Typography color="white">No tasks yet</Typography>
+                )}
+              </Box>
+              <Box flexDirection={'row'}>
+                <TextField
+                  label="TaskName"
+                  value={task.taskname}
+                  onChange={(e) => handleTaskUpdate('taskname', e.target.value)}
+                  sx={{ ...textFieldStyle, m: 1 }}
+                />
+                <TextField
+                  label="Task Description"
+                  multiline={true}
+                  maxRows={1}
+                  value={task.taskDescription}
+                  onChange={(e) => handleTaskUpdate('taskDescription', e.target.value)}
+                  sx={{ ...textFieldStyle, m: 1 }}
+                />
+                <TextField
+                  type="date"
+                  helperText="Start Date"
+                  value={task.startdate}
+                  onChange={(e) => handleTaskUpdate('startdate', e.target.value)}
+                  sx={{ ...textFieldStyle, m: 1, color: 'white', '& .MuiFormHelperText-root': { color: 'white' } }}
+                />
+                <TextField
+                  type="date"
+                  helperText="End Date"
+                  value={task.endDate}
+                  onChange={(e) => handleTaskUpdate('endDate', e.target.value)}
+                  sx={{ ...textFieldStyle, m: 1, color: 'white', '& .MuiFormHelperText-root': { color: 'white' } }}
+                />
+                <Button onClick={addTaskToMember}>Add Task</Button>
+              </Box>
             </Box>
           </Box>
-        </Box>
-      </Container>
-    </Box>
-  </>
-);
+        </Container>
+      </Box>
+    </>
+  );
 }
-

@@ -5,6 +5,6 @@ from App.Colony.models import project
 class invite(models.Model):
     invitor = models.ForeignKey(CustomUser, related_name='invitation_sender', on_delete=models.DO_NOTHING)
     invitee = models.ForeignKey(CustomUser, related_name='invitation_reciever', on_delete=models.DO_NOTHING)
-    projectname = models.ForeignKey(project, on_delete=models.DO_NOTHING)
+    projectname = models.CharField(max_length=255, blank=True)
     status = models.BooleanField(default=False)
     
