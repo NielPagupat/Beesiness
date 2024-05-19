@@ -60,6 +60,10 @@ export default function ManageProject() {
     navigation.navigate('ProjectAsLeader', { project, userEmail: userEmail } );
   };
 
+  const goToProjectDetailAsMember = (project) => {
+    navigation.navigate('ProjectAsMember', { project, userEmail: userEmail });
+  };
+
   return (
     <View style={styles.container}>
         <ImageBackground source={require('../assets/wallpaper.png')} style={{flex: 1, resizeMode: "cover", justifyContent: "center", paddingTop: StatusBar.currentHeight,}}>
@@ -97,12 +101,16 @@ export default function ManageProject() {
                         <View style={{margin:5}}>
                         {myCollaborations.length > 0 ? (
                         myCollaborations.map((collab) => (
-                            <Text key={collab.id} style={{ color: 'white', marginBottom: 2, marginLeft: 5 }}>
-                            {collab.projectName} ----- {collab.creator}
-                            </Text>
+                            <TouchableOpacity 
+                            key={collab.id}
+                            onPress={() => goToProjectDetailAsMember(collab)} 
+                            style={{backgroundColor:'white', marginVertical:5, padding:10, borderRadius:10}}
+                            >
+                            <Text>{collab.projectName} ----- {collab.creator}</Text>
+                            </TouchableOpacity>
                         ))
                         ) : (
-                        <Text sx={{ color: 'white' }}>No collaborations available</Text>
+                        <Text style={{ color: 'white' }}>No collaborations available</Text>
                         )}
                         </View>   
                     </View>
