@@ -2,20 +2,19 @@ import React, { useState } from 'react'
 import { View, StyleSheet, Text, ImageBackground, StatusBar, TouchableOpacity } from 'react-native';
 import { Avatar, Button, Icon, IconButton, Modal, TextInput } from 'react-native-paper'; 
 import TopNavigation from '../NavigationBars/TopNavigation';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { FlatList, ScrollView } from 'react-native-gesture-handler';
 
 
-export default function ManageProject() {
+export default function ProjectAsLeader() {
     const navigation = useNavigation()
+    const route = useRoute()
 
-    const [userEmail, setUserEmail] = useState();
-    const [allUsers, setAllUsers] = useState([]);
+    const project = route.params?.project;
+
+    const [allUsers, setAllUsers] = useState(project.members || []);
+    const [userEmail, setUserEmail] = useState(route.params?.userEmail || '');
     const [newMemberEmail, setNewMemberEmail] = useState('');
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [selectedUserEmail, setSelectedUserEmail] = useState('');
-    const [isNewModalVisible, setIsNewModalVisible] = useState(false);
-    const [selectedUserIndex, setSelectedUserIndex] = useState(null);
     const [newTask, setNewTask] = useState('');
 
 
@@ -27,177 +26,94 @@ export default function ManageProject() {
         navigation.navigate('ManageProject');
       }
 
-      const handleAddMember = () => {
-        if (newMemberEmail.trim()) {
-            setAllUsers([...allUsers, { email: newMemberEmail}]);
-            setNewMemberEmail('');
-        }
-    };
-    
-    const handleRemoveMember = (index) => {
-        const updatedUsers = [...allUsers];
-        updatedUsers.splice(index, 1);
-        setAllUsers(updatedUsers);
-      }
-    
-    const handleOpenEditModal = (index) => {
-        setSelectedUserIndex(index);
-        setIsModalVisible(true);
-      }
-    
-    const handleCloseModal = () => {
-        setSelectedUserIndex(null);
-        setIsModalVisible(false);
-      }
+    const [projectState, setProjectState] = useState({
+        projectName: project.projectName || '',
+        creator: project.creator || '',
+        members: project.members || [],
+    });
 
-      const handleAddTask = () => {
-        if (newTask.trim() && selectedUserIndex !== null) {
-            setAllUsers(prevUsers => {
-                const updatedUsers = [...prevUsers];
-                const user = updatedUsers[selectedUserIndex];
-                user.tasks = user.tasks ? [...user.tasks, newTask] : [newTask];
-                return updatedUsers;
-            });
-            setNewTask('');
-        }
+    const handleProjectUpdate = (key, value) => {
+      setProjectState(prevState => ({
+        ...prevState,
+        [key]: value,
+      }));
     };
-    
-    const renderTaskItem = ({ item }) => (
-        <View>
-            <Text style={{fontSize:16}}> ○ {item}</Text>
-        </View>
-    );
 
-    const handleOpenNewModal = (email) => {
-        setSelectedUserEmail(email);
-        setIsNewModalVisible(true);
-    }
-    
-    const handleCloseNewModal = () => {
-        setSelectedUserEmail('');
-        setIsNewModalVisible(false);
-    }
+    const [member, setMember] = useState('');
+    const [selectedMemberIndex, setSelectedMemberIndex] = useState(null);
+    const [task, setTask] = useState({
+        comment: [],
+        taskname: '',
+        taskDescription: '',
+        startdate: '',
+        endDate: '',
+        status: false,
+    });
+
+  const handleViewMember = (index) => {
+    setSelectedMemberIndex(index);
+  };
+
+  const viewMemberProgress = (index) => {
+    const memberData = projectState.members[index];
+    navigation.navigate('ProgressAsLeader', { project, member: memberData, projectName: projectState.projectName, projectID: project.id, creator: projectState.creator, userEmail: userEmail })
+  };
+
   return (
     <View style={styles.container}>
         <ImageBackground source={require('../assets/wallpaper.png')} style={styles.backgroundImage}>
         <View style={{width:'100%'}}>
-            <TopNavigation userEmail={userEmail} val={'project_name'} onPress={toLogOut}/>
+            <TopNavigation userEmail={userEmail} val={project.projectName} onPress={toLogOut}/>
         </View>
         <View style={styles.content}>
-            <View style={{backgroundColor:'#C19A6B', borderRadius:10, elevation:5, maxHeight:600, paddingBottom:40}}>
+            <View style={{backgroundColor:'#C19A6B', borderRadius:10, elevation:5, maxHeight:600, paddingBottom:0}}>
                 <TouchableOpacity onPress={toManageProject} style={{flexDirection:'row', alignItems:'center'}}>
                     <IconButton icon="chevron-left" size={40} />
                     <Text style={{color:'#303030', fontSize:14}}>Manage Projects</Text>
                 </TouchableOpacity>
                 <View style={{marginHorizontal:20}}>
-                    <View style={{flexDirection:'row', justifyContent:'space-between'}}>
-                        <Text style={{fontWeight:'bold'}}>People Involved in this Project:</Text>
-                        <Text style={{fontWeight:'bold'}}>Status</Text>
+                    <View style={{marginVertical:5}}>
+                        <Text style={{fontWeight:'bold', fontSize:16}}>People Involved in this Project:</Text>
                     </View>
-                    <ScrollView style={{maxHeight:320}}>
-                    {allUsers.map((user, index) => (
-                    <View key={index} style={{marginVertical:5}}>
-                        <View style={{flexDirection:'row', justifyContent:'space-between'}}>
-                        <TouchableOpacity onPress={() => handleOpenNewModal(user.email)} style={{flex:10, backgroundColor:'#fff', flexDirection:'row', justifyContent:'space-between', borderRadius:5}}>
-                            <Text style={{flex:1, alignSelf:'center', margin:10}} numberOfLines={1}>{user.email}</Text>
-                            <View style={{flexDirection:'row'}}>
-                            <TouchableOpacity onPress={() => handleOpenEditModal(index)}>
-                                <IconButton icon="clipboard-edit" size={20}/>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => handleRemoveMember(index)}>
-                                <IconButton icon="delete" size={20}/>
-                            </TouchableOpacity>
+                    <ScrollView style={{maxHeight:150}}>
+                        {projectState.members.map((member, index) => (
+                            <View key={index} style={{marginVertical:10}}>
+                                <View style={{flexDirection:'row', justifyContent:'space-between'}}>
+                                <TouchableOpacity onPress={() => viewMemberProgress(index)} style={{flex: 3, backgroundColor:'#fff', flexDirection:'row', borderTopLeftRadius:5, borderBottomLeftRadius:5}}>
+                                    <Text style={{alignSelf:'center', margin:10, fontSize:16}}>{member.name}</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => handleViewMember(index)} style={{flex: 1, backgroundColor:'#967542', justifyContent:'center', borderTopRightRadius:5, borderBottomRightRadius:5}}>
+                                    <Text style={{alignSelf:'center', margin:10, fontSize:16, color:'white'}}>Tasks</Text>
+                                </TouchableOpacity> 
+                                </View>
                             </View>
-                        </TouchableOpacity>
-                        <View style={{flex:.5}}></View>
-                        <View style={{flex:1.65, justifyContent:'center', alignItems:'center'}}>
-                            <View style={{flex:1, width:45, backgroundColor:'#fff', borderRadius:25}}></View>
-                        </View>
-                        </View>
-                    </View>
-                    ))}
+                        ))}
                     </ScrollView>
-                    <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
-                            <TextInput
-                                style={{backgroundColor:'rgba(0,0,0,0)', width:220}}
-                                underlineColor='black'
-                                activeUnderlineColor='black'
-                                label="Input a Member"
-                                value={newMemberEmail}
-                                onChangeText={setNewMemberEmail}
-                            />
-                            <TouchableOpacity onPress={handleAddMember} style={{backgroundColor:'#967542', padding:10, borderRadius:10, marginTop:20}}>
-                                <Text style={{color:'white'}}>Send Invite</Text>
-                            </TouchableOpacity>
+                </View>
+                <View style={{margin:20}}>
+                    <Text style={{fontSize:16, fontWeight:'bold'}}>Task Details</Text>
+                <ScrollView style={styles.tasksContainer}>
+                {selectedMemberIndex !== null && projectState.members[selectedMemberIndex].tasks.length > 0 ? (
+                    projectState.members[selectedMemberIndex].tasks.map((task, index) => (
+                        <View key={index} style={{margin:5, backgroundColor:'#fff', padding:10, borderRadius:10 }}>
+                        <Text style={{fontSize:16}}>Task {index + 1}: {task.taskname}</Text>
                         </View>
-                </View>
+                    ))
+                ) : (
+                    <View style={{margin: 10}}>
+                        <Text style={{fontSize:20, fontWeight:'bold'}}>No tasks yet</Text>
+                    </View>
+                )}
+                 </ScrollView>
                 <View style={{margin:20, marginHorizontal:75}}>
-                    <TouchableOpacity onPress={toManageProject} style={{backgroundColor:'#967542', padding:5, alignItems:'center', borderRadius:10}}>
-                        <Text style={{color:'white'}}>Save Project</Text>
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={{backgroundColor:'#967542', padding:10, alignItems:'center', borderRadius:10}}>
+                        <Text style={{color:'white', fontSize:16}}>Okay</Text>
                     </TouchableOpacity>
                 </View>
-                <View style={{marginHorizontal:75}}>
-                    <TouchableOpacity style={{backgroundColor:'#9E0000', padding:5, alignItems:'center', borderRadius:10}}>
-                        <Text style={{color:'white'}}>Delete Project</Text>
-                    </TouchableOpacity>
-                </View>     
+            </View>  
             </View>
         </View>
         </ImageBackground>
-        {selectedUserIndex !== null && (
-            <Modal
-                visible={isModalVisible}
-                onRequestClose={handleCloseModal}
-                onDismiss={handleCloseModal}
-            >
-                <View>  
-                    <View style={{backgroundColor:'#C19A6B', margin:10, padding: 20, borderRadius: 10, elevation: 10}}>
-                        <Text style={{fontSize:18, fontWeight: 'bold', marginBottom: 10,}}>Tasks for {allUsers[selectedUserIndex].email}</Text>
-                        <FlatList
-                            data={allUsers[selectedUserIndex].tasks}
-                            renderItem={renderTaskItem}
-                            keyExtractor={(item, index) => index.toString()}
-                        />
-                        <TextInput
-                            style={{marginVertical:10, backgroundColor:'white'}}
-                            underlineColor='black'
-                            activeUnderlineColor='black'
-                            label="New Task"
-                            value={newTask}
-                            onChangeText={setNewTask}
-                        />
-                        <TouchableOpacity style={{backgroundColor:'#967542', padding:10, alignItems:'center', borderRadius:10}} onPress={handleAddTask}>
-                            <Text style={{color:'white'}}>Add Task</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={handleCloseModal} style={{alignItems:'center', marginTop:10}}>
-                            <Text>Close</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Modal>
-        )}
-        {selectedUserEmail && (
-            <Modal
-                visible={isNewModalVisible}
-                onRequestClose={handleCloseNewModal}
-                onDismiss={handleCloseNewModal}
-            >
-                <View>  
-                    <View style={{backgroundColor:'#C19A6B', margin:10, padding: 20, borderRadius: 10, elevation: 10}}>
-                        <Text style={{fontSize:18, fontWeight: 'bold'}}>{selectedUserEmail}'s Progress</Text>
-                        <View style={{margin:20}}>
-                            <Text style={{fontSize:18}}>To do</Text>
-                        </View>
-                        <View style={{margin:20}}>
-                            <Text style={{fontSize:18}}>Comments you have made</Text>
-                        </View>
-                        <TouchableOpacity onPress={handleCloseNewModal} style={{backgroundColor:'#967542', padding:10, alignItems:'center', borderRadius:10}}>
-                            <Text style={{color:'white'}}>Close</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Modal>
-        )} 
     </View>
   )
 }

@@ -55,9 +55,13 @@ export default function ManageProject() {
     getMyProjects();
     getMyCollaborations();
   }, []);
-  
+
   const goToEditProject = (project) => {
-    navigation.navigate('/editProject', { state: { project } });
+    navigation.navigate('ProjectAsLeader', { project, userEmail: userEmail } );
+  };
+
+  const goToProjectDetailAsMember = (project) => {
+    navigation.navigate('ProjectAsMember', { project, userEmail: userEmail });
   };
 
   return (
@@ -81,7 +85,7 @@ export default function ManageProject() {
                             <TouchableOpacity
                             key={project.id}
                             onPress={() => goToEditProject(project)}
-                            style={{ color: 'white', marginBottom: 2, marginLeft: 5 }}
+                            style={{backgroundColor:'white', marginVertical:5, padding:10, borderRadius:10}}
                             >
                             <Text>{project.projectName}</Text>
                             </TouchableOpacity>
@@ -97,12 +101,16 @@ export default function ManageProject() {
                         <View style={{margin:5}}>
                         {myCollaborations.length > 0 ? (
                         myCollaborations.map((collab) => (
-                            <Text key={collab.id} style={{ color: 'white', marginBottom: 2, marginLeft: 5 }}>
-                            {collab.projectName} ----- {collab.creator}
-                            </Text>
+                            <TouchableOpacity 
+                            key={collab.id}
+                            onPress={() => goToProjectDetailAsMember(collab)} 
+                            style={{backgroundColor:'white', marginVertical:5, padding:10, borderRadius:10}}
+                            >
+                            <Text>{collab.projectName} ----- {collab.creator}</Text>
+                            </TouchableOpacity>
                         ))
                         ) : (
-                        <Text sx={{ color: 'white' }}>No collaborations available</Text>
+                        <Text style={{ color: 'white' }}>No collaborations available</Text>
                         )}
                         </View>   
                     </View>
