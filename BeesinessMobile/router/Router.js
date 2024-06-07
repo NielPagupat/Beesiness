@@ -9,6 +9,7 @@ import ManageProject from '../Pages/ManageProject'
 import ProjectAsLeader from '../Pages/ProjectAsLeader'
 import ProjectAsMember from '../Pages/ProjectAsMember'
 import ProgressAsLeader from '../Pages/ProgressAsLeader'
+import AboutUs from '../Pages/AboutUs'
 
 const Stack = createStackNavigator()
 export default function Router() {
@@ -19,6 +20,7 @@ export default function Router() {
             <Stack.Screen name='SignUp' component={SignUp} options={{ headerShown: false }}/>
             <Stack.Screen name='Activation' component={Activation} options={{ headerShown: false }}/>
             <Stack.Screen name='Dashboard' component={DashBoard} options={{ headerShown: false }}/>
+            <Stack.Screen name='AboutUs' component={AboutUs} options={{ headerShown: false }} />
             <Stack.Screen name='ManageProject' component={ManageProject} options={{ headerShown: false }}/>
             <Stack.Screen name='ProjectAsLeader' component={ProjectAsLeader} options={{ headerShown: false }}/>
             <Stack.Screen name='ProjectAsMember' component={ProjectAsMember} options={{ headerShown: false }}/>

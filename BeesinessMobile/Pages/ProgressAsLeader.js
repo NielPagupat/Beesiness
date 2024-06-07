@@ -33,7 +33,7 @@ export default function ProgressAsLeader() {
 
   const getComment = async () => {
     try {
-      const response = await axios.get(`http://192.168.1.11:8000/api/v2/auth/comments/project/${projectID}/receiver/${member.name}/`, {
+      const response = await axios.get(`http://192.168.43.173:8000/api/v2/auth/comments/project/${projectID}/receiver/${member.name}/`, {
         headers: {
           'Content-Type': 'application/JSON',
           'Referrer-Policy': 'same-origin',
@@ -48,7 +48,7 @@ export default function ProgressAsLeader() {
 
   const saveComment = async () => {
     try {
-      await axios.post('http://192.168.1.11:8000/api/v2/auth/api/projects/add-comment/', comment, {
+      await axios.post('http://192.168.43.173:8000/api/v2/auth/api/projects/add-comment/', comment, {
         headers:{
           'Content-Type': 'application/JSON',
           'Referrer-Policy': 'same-origin',

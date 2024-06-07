@@ -47,9 +47,13 @@ export default function Dashboard() {
     navigation.navigate('ManageProject', { userEmail: userEmail});
   }
 
-  const toAboutUs = () => {
-    navigation.navigate('AboutUs', {userEmail: userEmail});
-  }
+  const extractDate = (dateTimeString) => {
+    if (!dateTimeString) {
+      return "None"; 
+    }
+    const dateTimeParts = dateTimeString.split('T');
+    return dateTimeParts[0];
+  };
 
   return (
     <View style={styles.container}>
@@ -58,35 +62,8 @@ export default function Dashboard() {
           <TopNavigation userEmail={userEmail} val={'Beesiness'} onPress={toLogOut}/>
         </View>
         <View style={styles.content}>
-          <View style={{alignItems:'flex-end', marginHorizontal:20}}>
-            <TouchableOpacity onPress={() => setShowNotification(!showNotification)} style={{backgroundColor:'#C19A6B', borderRadius:10}}>
-              <IconButton icon="bell-outline" size={30} />
-            </TouchableOpacity>
-            {showNotification && (
-              <View style={styles.notificationContainer}>
-                <Text style={{fontSize:16}}>Notification content goes here</Text>
-              </View>
-            )}
-          </View>
-          <View style={{flexDirection:'row', alignItems:'center', marginHorizontal:20, margin:10}}>
-            <View>
-            <TouchableOpacity onPress={toManageProject} style={{flexDirection:'row', alignItems:'center', marginBottom:20}}>
-            <View style={{backgroundColor:'#C19A6B', borderRadius:10}}>
-              <IconButton icon="folder-outline" size={40} />
-            </View>
-            <View style={{marginHorizontal:10}}>
-              <Text style={{fontSize:16}}>Access Projects</Text>
-            </View>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={toAboutUs} style={{flexDirection:'row', alignItems:'center', marginBottom:20}}>
-            <View style={{backgroundColor:'#C19A6B', borderRadius:10}}>
-              <IconButton icon="account-group" size={40} />
-            </View>
-            <View style={{marginHorizontal:10}}>
-              <Text style={{fontSize:16}}>About Us</Text>
-            </View>
-            </TouchableOpacity>
-            </View>
+          <View style={{margin:20}}>
+            <Text style={{fontSize:20, fontWeight:'bold'}}>About Us</Text>
           </View>
         </View>
       </ImageBackground>

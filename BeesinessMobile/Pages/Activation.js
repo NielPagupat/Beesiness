@@ -20,7 +20,7 @@ export default function Login() {
         }))}
 
     const activateAcc = async () => {
-        await axios.post('http://192.168.1.10:8000/api/v2/auth/users/activation/', activationCreds,
+        await axios.post('http://192.168.43.173:8000/api/v2/auth/users/activation/', activationCreds,
         {headers:{
         'Content-Type':'application/JSON',
         'Referrer-Policy':'same-origin',
@@ -36,7 +36,7 @@ export default function Login() {
         
 
     const resendActivation = async() => {
-        const result = await axios.post('http://192.168.1.10:8000/api/v2/auth/users/resend_activation/', {"email":email},
+        const result = await axios.post('http://192.168.43.173:8000/api/v2/auth/users/resend_activation/', {"email":email},
         {headers:{
             'Content-Type':'application/JSON',
             'Referrer-Policy':'same-origin',

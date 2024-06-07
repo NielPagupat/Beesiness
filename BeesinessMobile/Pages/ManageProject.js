@@ -23,7 +23,7 @@ export default function ManageProject() {
 
     const getMyProjects = async () => {
         try {
-          const response = await axios.get(`http://192.168.1.11:8000/api/v2/auth/projects/creator/${userEmail}`, {
+          const response = await axios.get(`http://192.168.43.173:8000/api/v2/auth/projects/creator/${userEmail}`, {
             headers: {
               'Content-Type': 'application/JSON',
               'Referrer-Policy': 'same-origin',
@@ -38,7 +38,7 @@ export default function ManageProject() {
 
     const getMyCollaborations = async () => {
         try {
-        const response = await axios.get(`http://192.168.1.11:8000/api/v2/auth/projects/member/${userEmail}`, {
+        const response = await axios.get(`http://192.168.43.173:8000/api/v2/auth/projects/member/${userEmail}`, {
             headers: {
             'Content-Type': 'application/JSON',
             'Referrer-Policy': 'same-origin',
@@ -68,7 +68,7 @@ export default function ManageProject() {
     <View style={styles.container}>
         <ImageBackground source={require('../assets/wallpaper.png')} style={{flex: 1, resizeMode: "cover", justifyContent: "center", paddingTop: StatusBar.currentHeight,}}>
         <View style={{width:'100%'}}>
-            <TopNavigation userEmail={userEmail} val={'Manage Projects'} onPress={toLogOut}/>
+            <TopNavigation userEmail={userEmail} val={'Projects'} onPress={toLogOut}/>
         </View>
         <View style={styles.content}>
             <View style={{backgroundColor:'#C19A6B', borderRadius:10, paddingBottom:40, elevation:5}}>

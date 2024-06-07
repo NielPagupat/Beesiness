@@ -20,7 +20,7 @@ export default function ProjectAsMember() {
 
     const getComment = async () => {
         try {
-          const response = await axios.get(`http://192.168.1.11:8000/api/v2/auth/comments/project/${project.id}/receiver/${member.name}/`, {
+          const response = await axios.get(`http://192.168.43.173:8000/api/v2/auth/comments/project/${project.id}/receiver/${member.name}/`, {
             headers:{
               'Content-Type': 'application/JSON',
               'Referrer-Policy': 'same-origin',
@@ -56,7 +56,7 @@ export default function ProjectAsMember() {
 
     const updateTask = async () => {
     try {
-      await axios.put(`http://192.168.1.11:8000/api/v2/auth/editProject/${project.id}/`, project, {
+      await axios.put(`http://192.168.43.173:8000/api/v2/auth/editProject/${project.id}/`, project, {
         headers: {
           'Content-Type': 'application/JSON',
           'Referrer-Policy': 'same-origin',
