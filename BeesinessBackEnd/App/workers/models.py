@@ -24,4 +24,9 @@ class CustomUser(AbstractUser):
     def __str__(self) -> str:
         return '{}-{}'.format(self.email, self.last_name)
     
+class testUser(models.Model):
+    firstname = models.CharField(max_length=255)
+    lastname = models.CharField(max_length=255)
 
+    def __str__(self) -> str:
+        return '{}-{}'.format(self.firstname, self.lastname)

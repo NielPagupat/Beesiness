@@ -4,7 +4,7 @@ from djoser.serializers import UserCreateSerializer, ActivationSerializer
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 from djoser import utils
-from .models import CustomUser
+from .models import CustomUser, testUser
 User = get_user_model()
 
 class CustomUserSerializer(UserCreateSerializer):
@@ -27,3 +27,7 @@ class CustomUserSerializer(UserCreateSerializer):
 
         return attrs
     
+class CreateUser(serializers.ModelSerializer):
+    class Meta:
+        model = testUser
+        fields = "__all__"
