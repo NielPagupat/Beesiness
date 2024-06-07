@@ -65,7 +65,7 @@ export default function SignUp() {
 
     const register = async() => {
         console.log(userData)
-        const result = await axios.post('http://192.168.1.10:8000/api/v2/auth/users/', userData, 
+        const result = await axios.post('http://192.168.43.173:8000/api/v2/auth/users/', userData, 
         {headers:{
         'Content-Type':'application/JSON',
         'Referrer-Policy':'same-origin',
