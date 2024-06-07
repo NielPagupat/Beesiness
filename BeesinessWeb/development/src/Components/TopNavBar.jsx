@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography, Avatar, IconButton, Popover } from '@mui/material';
+import { AppBar, Toolbar, Typography, Avatar, IconButton, Popover, Button } from '@mui/material';
 import { NotificationsNone, ExitToApp as ExitToAppIcon } from '@mui/icons-material';
 
 const TopNavBar = ({ handleOpenPopover, handleClosePopover, anchorEl, toLogOut }) => {
@@ -20,6 +20,7 @@ const TopNavBar = ({ handleOpenPopover, handleClosePopover, anchorEl, toLogOut }
           >
             Beesiness
           </Typography>
+          <Button href='/aboutUs'>ABOUT US</Button>
           {/* Add bell icon button */}
           <IconButton color="inherit" onClick={handleOpenPopover}>
             <NotificationsNone/>

@@ -13,6 +13,12 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AddCircleOutline, Assignment } from '@mui/icons-material';
 import TopNavBar from '../Components/TopNavBar';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -34,7 +40,7 @@ const AppBar = styled(MuiAppBar, {
 
 const defaultTheme = createTheme();
 
-export default function Dashboard() {
+export default function newTable() {
   const navigate = useNavigate();
   const { email } = useParams();
   const [allUsers, setAllUsers] = React.useState([]);
@@ -43,21 +49,7 @@ export default function Dashboard() {
   const theme = useTheme();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
 
-  const getUserAccountsList = async () => {
-    try {
-      const response = await axios.get('http://localhost:8000/api/v2/auth/getAllUsers/', {
-        headers: {
-          'Content-Type': 'application/JSON',
-          'Referrer-Policy': 'same-origin',
-          'Cross-Origin-Opener-Policy': 'same-origin',
-        },
-      });
-      setAllUsers(response.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
+  
   const toLogOut = () => {
     navigate('/');
   };
@@ -72,17 +64,24 @@ export default function Dashboard() {
 
   const openNotification = Boolean(anchorEl);
 
-  const goToCreateProject = () => {
-    navigate('/createProject/' + email);
-  };
+  const [data, setData] = React.useState([])
 
-  const goToCheckProject = () => {
-    navigate('/checkProject/' + email);
-  };
-
-  const goToNewTable = () => {
-    navigate('/newTable')
+  const getAllData = async () => {
+    await axios.get('http://localhost:8000/api/v2/auth/getData/', {
+        headers:{
+          'Content-Type': 'application/JSON',
+          'Referrer-Policy': 'same-origin',
+          'Cross-Origin-Opener-Policy': 'same-origin',
+        }
+    }).then(response => {
+        setData(response.data)
+    })
   }
+
+  React.useEffect(()=>{
+    getAllData()
+  }, [])
+  
   return (
     <Box sx={{ display: 'flex', width: '100vw', height: '100vh' }}>
       <CssBaseline />
@@ -97,6 +96,10 @@ export default function Dashboard() {
           backgroundImage: 'url("../src/assets/beehive.png")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white', // Set text color to white
         }}
       >
         {anchorEl && (
@@ -116,64 +119,25 @@ export default function Dashboard() {
             <Typography sx={{ p: 2 }}>Notifications content</Typography>
           </Popover>
         )}
-        <Toolbar />
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center', alignContent: 'center' }}>
-          <Box
-            sx={{
-              backgroundColor: 'rgba(0, 0, 0, .5)',
-              height: isLargeScreen ? '70vh' : 'auto',
-              width: isLargeScreen ? '80vw' : '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              padding: isLargeScreen ? 5 : 2,
-              boxShadow: '0px 0px 10px rgba(0, 0, 0, 1)',
-              borderRadius: isLargeScreen ? 2 : 0,
-            }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginBottom: '20px',
-              }}
-            >
-              <Button
-                sx={{ fontSize: '20px', marginRight: '10px', minWidth: 0 }}
-                startIcon={<AddCircleOutline style={{ fontSize: 100, color: '#D28200' }} />}
-                onClick={goToCreateProject}
-              />
-              <Typography sx={{ color: 'white', fontSize: '20px' }}>Add Project</Typography>
-            </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}
-            >
-              <Button
-                sx={{ fontSize: '20px', marginRight: '10px', minWidth: 0 }}
-                startIcon={<Assignment style={{ fontSize: 100, color: '#D28200' }} />}
-                onClick={goToCheckProject}
-              />
-              <Typography sx={{ color: 'white', fontSize: '20px' }}>Access Project</Typography>
-            </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}
-            >
-              <Button
-                sx={{ fontSize: '20px', marginRight: '10px', minWidth: 0 }}
-                startIcon={<Assignment style={{ fontSize: 100, color: '#D28200' }} />}
-                onClick={goToNewTable}
-              />
-              <Typography sx={{ color: 'white', fontSize: '20px' }}>New Table</Typography>
-            </Box>
-          </Box>
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell style={{ color: 'white' }}>First Name</TableCell> {/* Set text color to white */}
+                  <TableCell style={{ color: 'white' }}>Last Name</TableCell> {/* Set text color to white */}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data.map((item, index) => (
+                  <TableRow key={index}>
+                    <TableCell style={{ color: 'white' }}>{item.firstname}</TableCell> {/* Set text color to white */}
+                    <TableCell style={{ color: 'white' }}>{item.lastname}</TableCell> {/* Set text color to white */}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Container>
       </Box>
     </Box>

@@ -10,6 +10,7 @@ import ProjectDetailsMember from '../Pages/ProjectDetailAsMember'
 import EditProject from '../Pages/EditProjectConfig'
 import TaskProgress from '../Pages/TaskProgressPage'
 import NewUser from '../Components/newUser'
+import Table from '../Components/Table'
 export default function Router() {
   return (
     <Routes>
@@ -23,6 +24,7 @@ export default function Router() {
         <Route path='/signup' element={<Signup/>} />
         <Route path='/activate/:email' element={<Activation/>} />
         <Route path='/aboutUs' element={<NewUser/>} />
+        <Route path='/newTable' element = {<Table/>} />
     </Routes>
   )
 }
